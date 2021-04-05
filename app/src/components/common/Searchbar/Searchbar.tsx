@@ -5,7 +5,7 @@ import { MdSearch } from 'react-icons/md';
 interface SearchbarProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   showIcon?: boolean;
-};
+}
 
 const Searchbar = ({ className, showIcon = true, icon }: SearchbarProps): JSX.Element => {
   return (

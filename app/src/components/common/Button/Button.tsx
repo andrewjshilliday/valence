@@ -6,7 +6,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'disabled';
 interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   type?: ButtonVariant;
-};
+}
 
 const Button = ({ className, children, onClick, type = 'primary' }: ButtonProps): JSX.Element => (
   <StyledButton className={className} onClick={onClick}>

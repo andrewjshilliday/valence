@@ -12,7 +12,7 @@ interface PlaybackControlProps extends React.HTMLAttributes<HTMLDivElement> {
   play: Function;
   previous: Function;
   stop: Function;
-};
+}
 
 const PlaybackControls = ({
   className,

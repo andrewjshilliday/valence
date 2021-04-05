@@ -7,7 +7,7 @@ interface NowPlayingProps extends React.HTMLAttributes<HTMLDivElement> {
   artistName: string;
   artwork: MusicKit.Artwork;
   trackName: string;
-};
+}
 
 const NowPlaying = ({ className, artwork, trackName, albumName, artistName }: NowPlayingProps): JSX.Element => (
   <StyledNowPlayingContainer className={className}>

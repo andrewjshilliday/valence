@@ -8,7 +8,7 @@ interface PlaybackProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   currentPlaybackTime: number;
   currentPlaybackTimeRemaining: number;
   seek: (v: number) => void;
-};
+}
 
 const PlaybackProgress = ({
   className,

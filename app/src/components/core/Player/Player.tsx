@@ -5,7 +5,7 @@ import { useMusicKit } from '../../providers';
 import { usePlayerStore } from '../../../store';
 import { NowPlaying, PlaybackControls, PlayerOptions, PlaybackProgress } from '.';
 
-interface PlayerProps extends React.HTMLAttributes<HTMLDivElement> {};
+interface PlayerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Player = ({ className }: PlayerProps): JSX.Element => {
   const musicKit = useMusicKit();

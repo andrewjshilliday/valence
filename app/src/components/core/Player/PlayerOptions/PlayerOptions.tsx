@@ -14,7 +14,7 @@ interface PlaybackOptionsProps extends React.HTMLAttributes<HTMLDivElement> {
   toggleFavourite: () => any;
   toggleRepeat: () => any;
   toggleShuffle: () => any;
-};
+}
 
 const PlaybackOptions = ({
   className,

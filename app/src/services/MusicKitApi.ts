@@ -144,10 +144,7 @@ const Search = async (term: string, types?: string, limit?: number): Promise<Mus
   return resp.data.results;
 };
 
-const GetRelationships = async (
-  collection: MusicKit.MediaItem[],
-  type: string
-): Promise<MusicKit.MediaItem[]> => {
+const GetRelationships = async (collection: MusicKit.MediaItem[], type: string): Promise<MusicKit.MediaItem[]> => {
   if (!collection) {
     return [];
   }
@@ -158,9 +155,7 @@ const GetRelationships = async (
 
   switch (type) {
     case 'albums': {
-      ids = collection
-        .filter((i: MusicKit.MediaItem) => i.type === 'albums')
-        .map((i: MusicKit.MediaItem) => i.id);
+      ids = collection.filter((i: MusicKit.MediaItem) => i.type === 'albums').map((i: MusicKit.MediaItem) => i.id);
 
       if (!ids || ids.length === 0) {
         return [];
@@ -187,9 +182,7 @@ const GetRelationships = async (
       return collection;
     }
     case 'playlists': {
-      ids = collection
-        .filter((i: MusicKit.MediaItem) => i.type === 'playlists')
-        .map((i: MusicKit.MediaItem) => i.id);
+      ids = collection.filter((i: MusicKit.MediaItem) => i.type === 'playlists').map((i: MusicKit.MediaItem) => i.id);
 
       if (!ids || ids.length === 0) {
         return [];

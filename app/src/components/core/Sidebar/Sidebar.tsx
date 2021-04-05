@@ -5,7 +5,7 @@ import { HiHome } from 'react-icons/hi';
 import { TiThLargeOutline } from 'react-icons/ti';
 import { RiPlayListFill } from 'react-icons/ri';
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {};
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Sidebar = ({ className }: SidebarProps): JSX.Element => {
   const location = useLocation();

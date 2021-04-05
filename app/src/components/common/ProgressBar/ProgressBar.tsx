@@ -8,7 +8,7 @@ interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
   /* onChange?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, v: number) => any | undefined; */
   onChangeCommit?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, v: number) => any;
   vertical?: boolean;
-};
+}
 
 const ProgressBar = ({
   bufferedPercent,

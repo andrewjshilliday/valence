@@ -67,7 +67,7 @@ const StyledAccountContainer = styled.div`
 `;
 
 const StyledProfileContextMenu = styled(ContextMenu)`
-  >* {
+  > * {
     line-height: 2.25rem;
     font-size: 0.9rem;
   }
