@@ -1,0 +1,21 @@
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.rounded {
+  border-radius: 0.5em;
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* display: inline-block; */
+  max-width: 100%;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.1;
+}

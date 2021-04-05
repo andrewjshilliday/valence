@@ -1,0 +1,30 @@
+{
+  "include": [ "./src", "./types" ],
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "jsx": "preserve",
+    "baseUrl": "./",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": [ "node", "snowpack-env" ],
+    "typeRoots": [ "./types" ]
+  },
+  "exclude": [
+    "test.tsx",
+    "**/*.spec.tsx"
+  ]
+}
