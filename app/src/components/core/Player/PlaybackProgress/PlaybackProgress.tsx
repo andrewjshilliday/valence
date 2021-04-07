@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ProgressBar } from '../../../common/';
 
 interface PlaybackProgressProps extends React.HTMLAttributes<HTMLDivElement> {
-  currentBufferedProgress: number;
+  currentBufferedProgress?: number;
   currentPlaybackDuration: number;
   currentPlaybackTime: number;
   currentPlaybackTimeRemaining: number;

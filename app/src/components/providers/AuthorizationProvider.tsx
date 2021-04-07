@@ -10,22 +10,22 @@ interface AuthorizationProviderState {
 const AuthorizationContext = createContext({} as AuthorizationProviderState);
 
 export const AuthorizationProvider = (props: any): JSX.Element => {
-  const [setIsAuthorizerd] = useAuthStore((s) => [s.setIsAuthorizerd]);
+  const [setIsAuthorized] = useAuthStore((s) => [s.setIsAuthorized]);
 
   useEffect(() => {
-    setIsAuthorizerd(MusicKit.getInstance().isAuthorized);
+    setIsAuthorized(MusicKit.getInstance().isAuthorized);
   }, []);
 
   const signIn = async () => {
     const musicKit = MusicKit.getInstance();
     await musicKit.authorize();
-    setIsAuthorizerd(true);
+    setIsAuthorized(true);
   };
 
   const signOut = async () => {
     const musicKit = MusicKit.getInstance();
     await musicKit.unauthorize();
-    setIsAuthorizerd(false);
+    setIsAuthorized(false);
   };
 
   const value = {

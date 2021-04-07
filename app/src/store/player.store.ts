@@ -1,47 +1,35 @@
-import { combine } from 'zustand/middleware';
-import { createStore } from './utils';
-declare const MusicKit: any;
-
-type PlayerStore = {
-  instance: MusicKit.MusicKitInstance | null;
-  isPlaying: boolean;
-  playbackLoading: boolean;
-  nowPlayingItem: MusicKit.MediaItem | null;
-  currentPlaybackTime: number;
-  currentPlaybackTimeRemaining: number;
-};
+import createStore from './createStore';
 
 const usePlayerStore = createStore(
-  combine(
-    {
-      instance: null,
-      isPlaying: false,
-      playbackLoading: false,
-      nowPlayingItem: null,
-      currentPlaybackTime: 0,
-      currentPlaybackTimeRemaining: 0
-    } as PlayerStore,
-    (set) => ({
-      setInstance: () => {
-        set(() => ({ instance: MusicKit.getInstance() }));
-      },
-      setIsPlaying: (isPlaying: boolean) => {
-        set(() => ({ isPlaying: isPlaying }));
-      },
-      setPlaybackLoading: (playbackLoading: boolean) => {
-        set(() => ({ playbackLoading: playbackLoading }));
-      },
-      setNowPlayingItem: (nowPlayingItem: MusicKit.MediaItem) => {
-        set(() => ({ nowPlayingItem: nowPlayingItem }));
-      },
-      setCurrentPlaybackTime: (currentPlaybackTime: number) => {
-        set(() => ({ currentPlaybackTime: currentPlaybackTime }));
-      },
-      setCurrentPlaybackTimeRemaining: (currentPlaybackTimeRemaining: number) => {
-        set(() => ({ currentPlaybackTimeRemaining: currentPlaybackTimeRemaining }));
-      }
-    })
-  )
+  {
+    currentPlaybackDuration: 0,
+    currentPlaybackTime: 0,
+    currentPlaybackTimeRemaining: 0,
+    isPlaying: false,
+    nowPlayingItem: <MusicKit.MediaItem | null>null,
+    playbackLoading: false
+  },
+  (set) => ({
+    setCurrentPlaybackDuration: (currentPlaybackDuration: number) => {
+      set(() => ({ currentPlaybackDuration }));
+    },
+    setCurrentPlaybackTime: (playbackTime: number, playbackTimeRemaining: number, playbackDuration: number) => {
+      set(() => ({
+        currentPlaybackTime: playbackTime,
+        currentPlaybackTimeRemaining: playbackTimeRemaining,
+        currentPlaybackDuration: playbackDuration
+      }));
+    },
+    setIsPlaying: (isPlaying: boolean) => {
+      set(() => ({ isPlaying }));
+    },
+    setNowPlayingItem: (nowPlayingItem: MusicKit.MediaItem) => {
+      set(() => ({ nowPlayingItem }));
+    },
+    setPlaybackLoading: (playbackLoading: boolean) => {
+      set(() => ({ playbackLoading }));
+    }
+  })
 );
 
 export default usePlayerStore;

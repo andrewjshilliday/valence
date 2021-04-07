@@ -1,55 +1,40 @@
-import React, { useState, useEffect, createContext, useContext, useLayoutEffect } from 'react';
-import { useEventListener } from '../../hooks';
+import React, { useEffect, createContext, useContext } from 'react';
+import shallow from 'zustand/shallow';
 import { usePlayerStore } from '../../store';
 
 interface MusicKitProviderState {
   playItem: Function;
-  play: Function;
-  pause: Function;
-  stop: Function;
-  next: Function;
-  previous: Function;
-  seek: Function;
-  setVolume: Function;
+  play: () => void;
+  pause: () => void;
+  stop: () => void;
+  next: () => void;
+  previous: () => void;
+  seek: (seekTo: number) => void;
+  setVolume: (volume: number) => void;
 }
 
 const MusicKitContext = createContext({} as MusicKitProviderState);
 
 export const MusicKitProvider = (props: any): JSX.Element => {
-  const [
-    instance,
-    setInstance,
-    setNowPlayingItem,
-    setCurrentPlaybackTime,
-    setCurrentPlaybackTimeRemaining,
-    setIsPlaying,
-    setPlaybackLoading
-  ] = usePlayerStore((s) => [
-    s.instance,
-    s.setInstance,
-    s.setNowPlayingItem,
-    s.setCurrentPlaybackTime,
-    s.setCurrentPlaybackTimeRemaining,
-    s.setIsPlaying,
-    s.setPlaybackLoading
-  ]);
+  const [setNowPlayingItem, setCurrentPlaybackTime, setIsPlaying, setPlaybackLoading] = usePlayerStore(
+    (s) => [s.setNowPlayingItem, s.setCurrentPlaybackTime, s.setIsPlaying, s.setPlaybackLoading],
+    shallow
+  );
 
   useEffect(() => {
-    setInstance();
-  }, []);
-
-  useEffect(() => {
-    if (!instance) {
-      return;
-    }
-
-    instance.addEventListener('mediaItemDidChange', mediaItemDidChange);
-    instance.addEventListener('playbackStateDidChange', playbackStateDidChange);
-    instance.addEventListener('playbackTimeDidChange', playbackTimeDidChange);
+    MusicKit.getInstance().addEventListener('mediaItemDidChange', mediaItemDidChange);
+    MusicKit.getInstance().addEventListener('playbackStateDidChange', playbackStateDidChange);
+    MusicKit.getInstance().addEventListener('playbackTimeDidChange', playbackTimeDidChange);
 
     const volume = localStorage.getItem('volume');
     volume != null ? setVolume(+volume) : setVolume(0.05);
-  }, [instance]);
+
+    return () => {
+      MusicKit.getInstance().removeEventListener('mediaItemDidChange', mediaItemDidChange);
+      MusicKit.getInstance().removeEventListener('playbackStateDidChange', playbackStateDidChange);
+      MusicKit.getInstance().removeEventListener('playbackTimeDidChange', playbackTimeDidChange);
+    };
+  }, []);
 
   const mediaItemDidChange = (event: any) => {
     setNowPlayingItem(event.item);
@@ -61,11 +46,12 @@ export const MusicKitProvider = (props: any): JSX.Element => {
   };
 
   const playbackTimeDidChange = (event: any) => {
-    setCurrentPlaybackTime(event.currentPlaybackTime);
-    setCurrentPlaybackTimeRemaining(event.currentPlaybackTimeRemaining);
+    setCurrentPlaybackTime(
+      event.currentPlaybackTime,
+      event.currentPlaybackTimeRemaining,
+      event.currentPlaybackDuration
+    );
   };
-
-  /* useEventListener('mediaItemDidChange', mediaItemDidChange, MusicKit.getInstance()); */
 
   const value = {
     playItem: playItem,

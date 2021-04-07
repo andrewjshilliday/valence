@@ -140,7 +140,7 @@ const ProgressBar = ({
         onMouseUp={handleMouseUp}
         vertical={vertical}
       />
-      <StyledScrubber offset={scrubberPosition ?? 0} vertical={vertical} />
+      <StyledScrubber offset={scrubberPosition || 0} vertical={vertical} />
     </>
   );
 };

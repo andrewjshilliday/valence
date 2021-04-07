@@ -1,22 +1,14 @@
-import { combine } from 'zustand/middleware';
-import { createStore } from './utils';
-declare const MusicKit: any;
-
-type AuthStore = {
-  isAuthorized: boolean | null;
-};
+import createStore from './createStore';
 
 const useAuthStore = createStore(
-  combine(
-    {
-      isAuthorized: null
-    } as AuthStore,
-    (set) => ({
-      setIsAuthorizerd: (isAuthorized: boolean) => {
-        set(() => ({ isAuthorized: isAuthorized }));
-      }
-    })
-  )
+  {
+    isAuthorized: <boolean | null>null
+  },
+  (set) => ({
+    setIsAuthorized: (isAuthorized: boolean) => {
+      set(() => ({ isAuthorized: isAuthorized }));
+    }
+  })
 );
 
 export default useAuthStore;

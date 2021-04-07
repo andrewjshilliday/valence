@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import shallow from 'zustand/shallow';
 import { BsMusicNoteBeamed } from 'react-icons/bs';
 import { useMusicKit } from '../../providers';
 import { usePlayerStore } from '../../../store';
@@ -7,23 +8,40 @@ import { NowPlaying, PlaybackControls, PlayerOptions, PlaybackProgress } from '.
 
 interface PlayerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+const selector = (s: any) => [
+  s.instance,
+  s.isPlaying,
+  s.nowPlayingItem,
+  s.playbackLoading,
+  s.setCurrentPlaybackTime,
+  s.setCurrentPlaybackTimeRemaining
+]
+
 const Player = ({ className }: PlayerProps): JSX.Element => {
   const musicKit = useMusicKit();
-  const [
+  /* const {
     instance,
     isPlaying,
     nowPlayingItem,
     playbackLoading,
     setCurrentPlaybackTime,
     setCurrentPlaybackTimeRemaining
+  } = usePlayerStore(); */
+  const [
+    currentPlaybackDuration,
+    currentPlaybackTime,
+    currentPlaybackTimeRemaining,
+    isPlaying,
+    nowPlayingItem,
+    playbackLoading
   ] = usePlayerStore((s) => [
-    s.instance,
+    s.currentPlaybackDuration,
+    s.currentPlaybackTime,
+    s.currentPlaybackTimeRemaining,
     s.isPlaying,
     s.nowPlayingItem,
-    s.playbackLoading,
-    s.setCurrentPlaybackTime,
-    s.setCurrentPlaybackTimeRemaining
-  ]);
+    s.playbackLoading
+  ], shallow);
 
   if (!nowPlayingItem) {
     return (
@@ -51,10 +69,10 @@ const Player = ({ className }: PlayerProps): JSX.Element => {
         stop={musicKit.stop}
       />
       <StyledPlaybackProgress
-        currentPlaybackDuration={instance?.player.currentPlaybackDuration ?? 0}
-        currentBufferedProgress={instance?.player.currentBufferedProgress ?? 0}
-        currentPlaybackTime={instance?.player.currentPlaybackTime ?? 0}
-        currentPlaybackTimeRemaining={instance?.player.currentPlaybackTimeRemaining ?? 0}
+        currentPlaybackDuration={currentPlaybackDuration ?? 0}
+        /* currentBufferedProgress={instance?.player.currentBufferedProgress ?? 0} */
+        currentPlaybackTime={currentPlaybackTime ?? 0}
+        currentPlaybackTimeRemaining={currentPlaybackTimeRemaining ?? 0}
         seek={(v) => musicKit.seek(v)}
       />
       <StyledPlayerOptions
