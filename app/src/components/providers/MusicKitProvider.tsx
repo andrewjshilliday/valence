@@ -67,11 +67,48 @@ export const MusicKitProvider = (props: any): JSX.Element => {
   return <MusicKitContext.Provider value={value}>{props.children}</MusicKitContext.Provider>;
 };
 
-const playItem = async (/* item: MusicKit.MediaItem */) => {
-  await MusicKit.getInstance().setQueue({
+const playItem = async (item: MusicKit.MediaItem, startIndex: number = 0, shuffle: boolean = false) => {
+  const musicKit = MusicKit.getInstance();
+  /* await MusicKit.getInstance().setQueue({
     album: '1025210938'
   });
-  play();
+  play(); */
+  try {
+    const { playParams } = item.attributes;
+    musicKit.player.shuffleMode = 0;
+
+    if (
+      musicKit.playbackState !== 2 &&
+      musicKit.player.nowPlayingItem &&
+      item.type !== 'songs' &&
+      item.relationships?.tracks.data[startIndex]?.id === musicKit.player.nowPlayingItem.id
+    ) {
+      play();
+      return;
+    }
+
+    await musicKit.setQueue({
+      [playParams.kind]: playParams.id
+    });
+
+    if (startIndex !== 0) {
+      await musicKit.changeToMediaAtIndex(startIndex);
+    }
+
+    if (shuffle) {
+      musicKit.player.shuffleMode = 1;
+    }
+
+    /* if (item.type.includes('playlists')) {
+      nowPlayingPlaylist = item;
+    } else {
+      nowPlayingPlaylist = null;
+    } */
+
+    play();
+  } catch (ex) {
+    stop();
+  }
 };
 
 const play = () => {

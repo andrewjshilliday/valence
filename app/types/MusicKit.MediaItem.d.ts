@@ -109,6 +109,10 @@ declare namespace MusicKit {
      * The type of the media item.
      */
     type: any;
+    /**
+     * TODO
+     */
+    views: any;
   }
 
   /**

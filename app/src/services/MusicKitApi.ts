@@ -1,6 +1,6 @@
 import axios from 'axios';
 declare const MusicKit: any;
-const APPLE_MUSIC_API = 'https://api.music.apple.com';
+const APPLE_MUSIC_API = import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_API;
 
 type IncludeTypes = 'songs' | 'artists' | 'albums' | 'playlists';
 
@@ -9,8 +9,11 @@ interface MusicKitApiService {
   Artists: (ids: string[], include?: string) => Promise<MusicKit.MediaItem[]>;
   Album: (id: string, include?: string) => Promise<MusicKit.MediaItem>;
   Albums: (ids: string[], include?: string) => Promise<MusicKit.MediaItem[]>;
+  HeavyRotation: () => Promise<MusicKit.MediaItem[]>;
   Playlist: (id: string, include?: string) => Promise<MusicKit.MediaItem>;
   Playlists: (ids: string[], include?: string) => Promise<MusicKit.MediaItem[]>;
+  RecentPlayed: () => Promise<MusicKit.MediaItem[]>;
+  Recommendations: () => Promise<any>;
   Songs: (ids: string[], include?: string) => Promise<MusicKit.MediaItem[]>;
   Search: (term: string, types?: string, limit?: number) => Promise<MusicKit.Resource>;
   GetRelationships: (collection: MusicKit.MediaItem[], type: string) => any;
@@ -87,6 +90,13 @@ const Albums = async (ids: string[], include?: string): Promise<MusicKit.MediaIt
   return resp.data.data;
 };
 
+const HeavyRotation = async (): Promise<MusicKit.MediaItem[]> => {
+  const url = `${APPLE_MUSIC_API}/v1/me/history/heavy-rotation`;
+
+  const resp = await axios.get(url, { headers: GetHeaders() });
+  return resp.data.data;
+};
+
 const Playlist = async (id: string, include?: string): Promise<MusicKit.MediaItem> => {
   const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/playlists/${id}`;
   let params: MusicKit.QueryParameters = {};
@@ -110,6 +120,30 @@ const Playlists = async (ids: string[], include?: string): Promise<MusicKit.Medi
   }
 
   const resp = await axios.get(url, { headers: GetHeaders(), params: params });
+  return resp.data.data;
+};
+
+const RecentPlayed = async (includeAll: boolean = true): Promise<any> => {
+  const results: any[] = []; 
+
+  const fetch = async (url: string = `${APPLE_MUSIC_API}/v1/me/recent/played`) => {
+    const resp = await axios.get(url, { headers: GetHeaders() });
+    results.push(...resp.data.data);
+
+    if (includeAll && resp.data.next) {
+      await fetch(`${APPLE_MUSIC_API}${resp.data.next}`);
+    }
+  }
+
+  await fetch();
+
+  return results;
+};
+
+const Recommendations = async (): Promise<any> => {
+  const url = `${APPLE_MUSIC_API}/v1/me/recommendations`;
+
+  const resp = await axios.get(url, { headers: GetHeaders() });
   return resp.data.data;
 };
 
@@ -235,14 +269,19 @@ const GetRelationships = async (collection: MusicKit.MediaItem[], type: string):
   return [];
 };
 
-export const MusicKitApiService: MusicKitApiService = {
+const MusicKitApiService: MusicKitApiService = {
   Artist,
   Artists,
   Album,
   Albums,
+  HeavyRotation,
   Playlist,
   Playlists,
+  RecentPlayed,
+  Recommendations,
   Songs,
   Search,
   GetRelationships
 };
+
+export default MusicKitApiService;

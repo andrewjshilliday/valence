@@ -1,17 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MdSearch } from 'react-icons/md';
 
-interface SearchbarProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SearchBarProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   showIcon?: boolean;
+  onSearch: (value: string | null) => void;
 }
 
-const Searchbar = ({ className, showIcon = true, icon }: SearchbarProps): JSX.Element => {
+const SearchBar = ({ className, showIcon = true, icon, onSearch }: SearchBarProps): JSX.Element => {
+  const [value, setValue] = useState(null);
+
+  const handleSearch = (e: any): void => {
+    if (e.keyCode === 13) {
+      console.log(value);
+      onSearch(value);
+    }
+  };
+
   return (
     <StyledInputContainer className={className}>
-      {showIcon && (icon != null ? icon : <StyledSearchIcon />)}
-      <StyledInput placeholder={'Search'} />
+      {showIcon && (icon != null ? icon : <StyledSearchIcon onClick={() => onSearch(value)} />)}
+      <StyledInput placeholder={'Search'} onChange={(e: any) => setValue(e.target.value)} onKeyUp={handleSearch} />
     </StyledInputContainer>
   );
 };
@@ -29,6 +39,12 @@ const StyledSearchIcon = styled(MdSearch)`
   height: 1.5rem;
   width: 1.5rem;
   margin: 0 0.5rem 0 0;
+  transition: transform 300ms ease-in-out;
+
+  :hover {
+    cursor: pointer;
+    transform: scale(1.2);
+  }
 `;
 
 const StyledInput = styled.input`
@@ -39,4 +55,4 @@ const StyledInput = styled.input`
   border: none;
 `;
 
-export default Searchbar;
+export default SearchBar;

@@ -1,25 +1,32 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { BsMusicNoteBeamed } from 'react-icons/bs';
 import { FaUser } from 'react-icons/fa';
 import { IoMdNotifications } from 'react-icons/io';
 import { useAuthorization } from '../../providers';
 import { useAuthStore } from '../../../store';
-import { Button, ContextMenu, IconButton, Searchbar } from '../../common';
+import { Button, ContextMenu, IconButton, SearchBar } from '../../common';
 import Navigation from './Navigation/Navigation';
 
 interface HeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Header = ({ className }: HeaderProps): JSX.Element => {
   const auth = useAuthorization();
+  const history = useHistory();
   const [isAuthorized] = useAuthStore((s) => [s.isAuthorized]);
+
+  const search = (query: string | null) => {
+    if (query) {
+      history.push(`/search/${query}`);
+    }
+  }
 
   return (
     <StyledHeader className={className}>
       <StyledLogo />
       <Navigation />
-      <StyledSearchbar />
+      <StyledSearchbar onSearch={search} />
       <StyledAccountContainer>
         {isAuthorized ? (
           <>
@@ -50,7 +57,7 @@ const StyledLogo = styled(BsMusicNoteBeamed)`
   margin-left: 2rem;
 `;
 
-const StyledSearchbar = styled(Searchbar)`
+const StyledSearchbar = styled(SearchBar)`
   width: 40%;
 `;
 

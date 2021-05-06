@@ -41,7 +41,7 @@ const StyledSidebar = styled(Sidebar)`
 const StyledAppBody = styled.main`
   grid-area: main;
   overflow: auto;
-  padding: 1rem;
+  padding-right: 1rem;
   height: calc(100vh - 300px);
 `;
 

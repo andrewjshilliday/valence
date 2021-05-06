@@ -47,4 +47,4 @@ const combineImmerDevtools = <PrimaryState extends State, SecondaryState extends
   return devtools(combine(initialState, immer(config)), 'Valence');
 };
 
-export default pipe(combineImmerDevtools, withLog, create);
+export default pipe(combineImmerDevtools, /* withLog,  */create);

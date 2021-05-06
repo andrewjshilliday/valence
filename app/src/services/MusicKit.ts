@@ -31,6 +31,8 @@ const GenerateArtwork = (url: string): MusicKit.Artwork => {
   return artwork;
 };
 
-export const MusicKitService: MusicKitService = {
+const MusicKitService: MusicKitService = {
   FormatArtwork
 };
+
+export default MusicKitService;
