@@ -1,7 +1,7 @@
 service:
   name: valence-api
 # app and org for use with dashboard.serverless.com
-#app: your-app-name
+app: valence
 #org: your-org-name
 
 custom:
