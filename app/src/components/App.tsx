@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from 'styled-components';
 import Layout from './Layout';
 import { AuthorizationProvider, MusicKitProvider } from './providers';
-import { Artist, Album, Browse, Home, ListenNow, Playlist, Playlists, Search, Settings } from '../routes';
+import { Artist, Album, Browse, Home, Playlist, Playlists, Search, Settings } from '../routes';
 import { useHistoryStore, useThemeStore } from '../store';
 import { lightTheme, darkTheme } from '../theme';
 import GlobalStyles from './GlobalStyles';
@@ -50,7 +50,6 @@ const App = (): JSX.Element => {
                     <Route path={'/artist/:id'} exact component={Artist} />
                     <Route path={'/album/:id'} exact component={Album} />
                     <Route path={'/playlist/:id'} exact component={Playlist} />
-                    <Route path={'/listen-now'} exact component={ListenNow} />
                     <Redirect to={'/home'} />
                   </Switch>
                 </Layout>
