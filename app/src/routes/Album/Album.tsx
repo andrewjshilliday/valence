@@ -1,4 +1,4 @@
-import React, { createRef, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { createRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
@@ -15,6 +15,7 @@ type AlbumRouterProps = {
 
 const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   const id = props.match.params.id;
+  const [hasMultipleDiscs, setHasMultipleDiscs] = useState(false);
   const albumRef = useRef<MusicKit.MediaItem | null>(null);
   const notesRef = createRef<HTMLDivElement>();
 
@@ -60,6 +61,12 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   };
 
   const otherAlbums = useMemo(getOtherAlbums, [album]);
+
+  useEffect(() => {
+    setHasMultipleDiscs(
+      album?.relationships.tracks.data.some((track: MusicKit.MediaItem) => track.attributes.discNumber === 2)
+    );
+  }, [album]);
 
   useLayoutEffect(() => {
     setEditorialNotesStyle();
@@ -123,7 +130,25 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
               <h2>{album.attributes.genreNames && <>&nbsp;| {album.attributes.genreNames[0]}</>}</h2>
             </ArtistGenre>
           </TrackListHeader>
-          <MediaItemList collection={album} items={album.relationships.tracks.data} />
+          {!hasMultipleDiscs ? (
+            <MediaItemList collection={album} items={album.relationships.tracks.data} />
+          ) : (
+            [
+              ...new Set(
+                album.relationships.tracks.data.map((track: MusicKit.MediaItem) => track.attributes.discNumber)
+              )
+            ].map((discNumber: unknown) => (
+              <div key={`disc${discNumber}`}>
+                <strong>Disc {discNumber}</strong>
+                <MediaItemList
+                  collection={album}
+                  items={album.relationships.tracks.data.filter(
+                    (track: MusicKit.MediaItem) => track.attributes.discNumber === discNumber
+                  )}
+                />
+              </div>
+            ))
+          )}
           <ReleaseDate>
             Released: {moment(album.attributes.releaseDate).format('dddd, MMMM D, YYYY')} <br />
             {album.attributes.recordLabel} | {album.attributes.copyright}
@@ -131,7 +156,7 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
         </TrackListContainer>
       </AlbumTracksContainer>
       {otherAlbums.map(
-        (asd: any) => asd.data.length > 0 && <MediaItemCarousel key={asd.title} items={asd.data} title={asd.title} />
+        (category: any) => category.data.length > 0 && <MediaItemCarousel key={category.title} items={category.data} title={category.title} />
       )}
     </AlbumContainer>
   );
