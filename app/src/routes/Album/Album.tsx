@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
@@ -16,7 +16,6 @@ type AlbumRouterProps = {
 const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   const id = props.match.params.id;
   const [hasMultipleDiscs, setHasMultipleDiscs] = useState(false);
-  const albumRef = useRef<MusicKit.MediaItem | null>(null);
   const notesRef = createRef<HTMLDivElement>();
 
   const { isLoading: valenceLoading, error: valenceError, data: valenceAlbum } = useQuery<MusicKit.MediaItem>(
@@ -75,14 +74,13 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   }, [notesRef]);
 
   const setEditorialNotesStyle = () => {
-    if (!albumRef.current?.attributes?.editorialNotes || !notesRef.current) {
+    if (!album?.attributes?.editorialNotes || !notesRef.current) {
       return;
     }
 
-    const height = window.innerHeight;
-    // const notesOffsetTop = notesRef.current.getBoundingClientRect().top;
-    // notesRef.current.style.maxHeight = `${height - notesOffsetTop - 150}px`;
-    notesRef.current.style.maxHeight = `${height - 150 - 10 - notesRef.current.clientWidth - 23 - 150}px`;
+    const notesOffsetTop = notesRef.current.getBoundingClientRect().top;
+    notesRef.current.style.maxHeight = `${window.innerHeight - notesOffsetTop - 150}px`;
+    // notesRef.current.style.maxHeight = `${height - 150 - 10 - notesRef.current.clientWidth - 23 - 150}px`;
   };
 
   if (!album || valenceLoading || musicKitLoading) {
@@ -98,11 +96,12 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
       <AlbumTracksContainer>
         <SidebarContainer>
           <StickySidebar>
-            <img
-              src={MusicKitService.FormatArtwork(album.attributes.artwork, 500)}
-              className="img-fluid rounded"
-              alt={album.attributes.name}
-            />
+            <StyledImageContainer>
+              <StyledImage
+                src={MusicKitService.FormatArtwork(album.attributes.artwork, 500)}
+                alt={album.attributes.name}
+              />
+            </StyledImageContainer>
             <p>
               {album.relationships.tracks.data.length} Songs, {albumDuration}
             </p>
@@ -206,4 +205,18 @@ const ReleaseDate = styled.p`
 `;
 const ArtistGenre = styled.div`
   display: flex;
+`;
+
+const StyledImageContainer = styled.div`
+  position: relative;
+  height: 0;
+  padding-top: 100%;
+`;
+
+const StyledImage = styled.img`
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+  position: absolute;
+  top: 0;
 `;

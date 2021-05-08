@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
+import cloneDeep from 'lodash.clonedeep';
 import { LoadingSpinner, MediaItemCarousel } from '../../components/common';
 import { MusicKitApiService } from '../../services';
 
@@ -26,7 +27,7 @@ const Home = (): JSX.Element => {
   const [recommendations, setRecommendations] = useState(defaultRecommendationsState);
 
   const fetchAll = async (resource: MusicKit.Resource | undefined) => {
-    const data: MusicKit.MediaItem[] = JSON.parse(JSON.stringify(resource?.data));
+    const data = cloneDeep<MusicKit.MediaItem[]>(resource?.data);
     let nextUrl: string = resource?.next;
     while (nextUrl) {
       const results = await MusicKitApiService.Resource(nextUrl);
@@ -80,42 +81,40 @@ const Home = (): JSX.Element => {
     { enabled: heavyRotationData?.data.length > 0 }
   );
 
-  const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery<any>(
+  const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery<{
+    recommendations?: MusicKit.Resource[] | undefined;
+    recentPlayed: MusicKit.MediaItem[];
+    heavyRotation: MusicKit.MediaItem[];
+    newReleases: MusicKit.MediaItem[];
+  }>(
     `homeRecommendationsRelationships`,
     async () => {
-      const recommendationsRelationships = null;
-      const recentPlayedRelationships = MusicKitApiService.GetRelationships(
-        JSON.parse(JSON.stringify(recommendations.recentPlayed)),
-        'albums'
+      const recommendationsRelationships = recommendations.recommendations.map((recommendation: MusicKit.Resource) =>
+        MusicKitApiService.GetRelationships(cloneDeep(recommendation.items))
       );
-      const heavyRotationRelationships = MusicKitApiService.GetRelationships(
-        JSON.parse(JSON.stringify(recommendations.heavyRotation)),
-        'albums'
-      );
-      const newReleasesRelationships = MusicKitApiService.GetRelationships(
-        JSON.parse(JSON.stringify(recommendations.newReleases)),
-        'albums'
-      );
+      const recentPlayedRelationships = MusicKitApiService.GetRelationships(cloneDeep(recommendations.recentPlayed));
+      const heavyRotationRelationships = MusicKitApiService.GetRelationships(cloneDeep(recommendations.heavyRotation));
+      const newReleasesRelationships = MusicKitApiService.GetRelationships(cloneDeep(recommendations.newReleases));
 
       const results = await Promise.all([
-        recommendationsRelationships,
         recentPlayedRelationships,
         heavyRotationRelationships,
-        newReleasesRelationships
+        newReleasesRelationships,
+        Promise.all(recommendationsRelationships)
       ]);
 
-      setRecommendations((prev) => ({
-        ...prev,
-        recentPlayed: results[1],
-        heavyRotation: results[2],
-        newReleases: results[3]
-      }));
-      return {
-        recommendations: results[0],
-        recentPlayed: results[1],
-        heavyRotation: results[2],
-        newReleases: results[3]
+      const data = {
+        recentPlayed: results[0],
+        heavyRotation: results[1],
+        newReleases: results[2],
+        recommendations: recommendations.recommendations.map((recommendation: MusicKit.Resource, index: number) => ({
+          title: recommendation.title,
+          items: results[3][index]
+        }))
       };
+
+      setRecommendations((prev) => ({ ...prev, ...data }));
+      return data;
     },
     {
       enabled:
@@ -144,18 +143,20 @@ const Home = (): JSX.Element => {
       stations: recommendationsData.find(
         (result: any) => result.attributes.title.stringForDisplay === 'Stations for You'
       ).relationships.contents.data,
-      recommendations: recommendationsData
-        .filter(
-          (result: any) =>
-            !result.attributes.isGroupRecommendation &&
-            result.attributes.title.stringForDisplay !== 'Made for You' &&
-            result.attributes.title.stringForDisplay !== 'New Releases' &&
-            result.attributes.title.stringForDisplay !== 'Stations for You'
-        )
-        .map((result: any) => ({
-          title: result.attributes.title.stringForDisplay,
-          items: result.relationships.contents.data
-        }))
+      recommendations:
+        relationshipsData?.recommendations ??
+        recommendationsData
+          .filter(
+            (result: any) =>
+              !result.attributes.isGroupRecommendation &&
+              result.attributes.title.stringForDisplay !== 'Made for You' &&
+              result.attributes.title.stringForDisplay !== 'New Releases' &&
+              result.attributes.title.stringForDisplay !== 'Stations for You'
+          )
+          .map((result: any) => ({
+            title: result.attributes.title.stringForDisplay,
+            items: result.relationships.contents.data
+          }))
     });
   }, [recommendationsData, recentPlayedData, heavyRotationData]);
 

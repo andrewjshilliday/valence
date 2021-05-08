@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { RouteComponentProps } from 'react-router-dom';
 import styled from 'styled-components';
+import cloneDeep from 'lodash.clonedeep';
 import { LoadingSpinner, MediaItemCarousel } from '../../components/common';
 import { MusicKitApiService } from '../../services';
 
@@ -19,13 +20,13 @@ const Search = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   const { isIdle, data: searchDataRelationships } = useQuery<MusicKit.Resource>(
     ['searchDataRelationships', query],
     async () => {
-      const newData: MusicKit.Resource = JSON.parse(JSON.stringify(searchData));
+      const newData = cloneDeep<MusicKit.Resource | undefined>(searchData);
 
-      if (newData.albums && !newData.albums?.data[0]?.relationships) {
-        newData.albums.data = await MusicKitApiService.GetRelationships(newData.albums.data, 'albums');
+      if (newData?.albums && !newData.albums?.data[0]?.relationships) {
+        newData.albums.data = await MusicKitApiService.GetRelationships(newData.albums.data);
       }
-      if (newData.playlists && !newData.playlists?.data[0]?.relationships) {
-        newData.playlists.data = await MusicKitApiService.GetRelationships(newData.playlists.data, 'playlists');
+      if (newData?.playlists && !newData.playlists?.data[0]?.relationships) {
+        newData.playlists.data = await MusicKitApiService.GetRelationships(newData.playlists.data);
       }
 
       return newData;

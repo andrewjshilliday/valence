@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
@@ -12,7 +12,6 @@ type PlaylistRouterProps = {
 
 const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element => {
   const id = props.match.params.id;
-  const playlistRef = useRef<MusicKit.MediaItem | null>(null);
   const notesRef = createRef<HTMLDivElement>();
 
   const { isLoading: valenceLoading, error: valenceError, data: valencePlaylist } = useQuery<MusicKit.MediaItem>(
@@ -52,13 +51,12 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
   }, [notesRef]);
 
   const setEditorialNotesStyle = () => {
-    if (!playlistRef.current?.attributes?.editorialNotes || !notesRef.current) {
+    if (!playlist?.attributes?.editorialNotes || !notesRef.current) {
       return;
     }
 
-    const height = window.innerHeight;
     const notesOffsetTop = notesRef.current.getBoundingClientRect().top;
-    notesRef.current.style.maxHeight = `${height - notesOffsetTop - 150}px`;
+    notesRef.current.style.maxHeight = `${window.innerHeight - notesOffsetTop - 150}px`;
   };
 
   if (!playlist || valenceLoading || musicKitLoading) {
@@ -74,11 +72,12 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
       <PlaylistTracksContainer>
         <SidebarContainer>
           <StickySidebar>
-            <img
-              src={MusicKitService.FormatArtwork(playlist.attributes.artwork, 500)}
-              className="img-fluid rounded"
-              alt={playlist.attributes.name}
-            />
+            <StyledImageContainer>
+              <StyledImage
+                src={MusicKitService.FormatArtwork(playlist.attributes.artwork, 500)}
+                alt={playlist.attributes.name}
+              />
+            </StyledImageContainer>
             <p>
               {playlist.relationships.tracks.data.length} Songs, {playlistDuration}
             </p>
@@ -170,4 +169,18 @@ const ReleaseDate = styled.p`
 `;
 const ArtistGenre = styled.div`
   display: flex;
+`;
+
+const StyledImageContainer = styled.div`
+  position: relative;
+  height: 0;
+  padding-top: 100%;
+`;
+
+const StyledImage = styled.img`
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+  position: absolute;
+  top: 0;
 `;

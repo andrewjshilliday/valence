@@ -12,11 +12,13 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
   const albumTemplate = (
     <>
       <Link to={`/album/${item.id}`}>
-        <img
-          src={MusicKitService.FormatArtwork(item.attributes.artwork, 500)}
-          className="img-fluid rounded"
-          alt={item.attributes.name}
-        />
+        {/* <StyledImageDiv imageUrl={MusicKitService.FormatArtwork(item.attributes.artwork, 500)} role={'img'} /> */}
+        <StyledImageContainer>
+          <StyledImage
+            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            alt={item.attributes.name}
+          />
+        </StyledImageContainer>
         <span className="text-truncate">{item.attributes.name}</span>
       </Link>
       {item.relationships?.artists?.data.length > 0 ? (
@@ -31,11 +33,12 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
   const playlistTemplate = (
     <>
       <Link to={`/playlist/${item.id}`}>
-        <img
-          src={MusicKitService.FormatArtwork(item.attributes.artwork, 500)}
-          className="img-fluid rounded"
-          alt={item.attributes.name}
-        />
+        <StyledImageContainer>
+          <StyledImage
+            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            alt={item.attributes.name}
+          />
+        </StyledImageContainer>
         <span className="text-truncate">{item.attributes.name}</span>
       </Link>
       <span className="text-truncate">{item.attributes.curatorName}</span>
@@ -44,11 +47,12 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
   const artistTemplate = (
     <>
       <Link to={`/artist/${item.id}`}>
-        <img
-          src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
-          className="img-fluid rounded"
-          alt={item.attributes.name}
-        />
+        <StyledImageContainer>
+          <StyledImage
+            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            alt={item.attributes.name}
+          />
+        </StyledImageContainer>
         <span className="text-truncate">{item.attributes.name}</span>
       </Link>
     </>
@@ -111,4 +115,26 @@ const MediaItem = styled.div`
       max-width: 50%;
     }
   }
+`;
+
+const StyledImageContainer = styled.div`
+  position: relative;
+  height: 0;
+  padding-top: 100%;
+`;
+
+const StyledImage = styled.img`
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+  position: absolute;
+  top: 0;
+`;
+
+const StyledImageDiv = styled.div<{ imageUrl: string }>`
+  padding-top: 100%;
+  background-image: url(${({ imageUrl }) => imageUrl});
+  background-size: contain;
+  background-repeat: no-repeat;
+  border-radius: 0.5em;
 `;

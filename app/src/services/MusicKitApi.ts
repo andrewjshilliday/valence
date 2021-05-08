@@ -17,7 +17,7 @@ interface MusicKitApiService {
   Resource: (url: string) => Promise<MusicKit.Resource>;
   Songs: (ids: string[], include?: string) => Promise<MusicKit.MediaItem[]>;
   Search: (term: string, types?: string, limit?: number) => Promise<MusicKit.Resource>;
-  GetRelationships: (collection: MusicKit.MediaItem[], type: string) => any;
+  GetRelationships: (collection: MusicKit.MediaItem[]) => Promise<MusicKit.MediaItem[]>;
 }
 
 const GetHeaders = () => {
@@ -124,7 +124,7 @@ const Playlists = async (ids: string[], include?: string): Promise<MusicKit.Medi
   return resp.data.data;
 };
 
-const RecentPlayed = async (/* includeAll: boolean = true,  */nextUrl?: string): Promise<MusicKit.Resource> => {
+const RecentPlayed = async (/* includeAll: boolean = true,  */ nextUrl?: string): Promise<MusicKit.Resource> => {
   const url = `${APPLE_MUSIC_API}${nextUrl ?? '/v1/me/recent/played'}`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
@@ -190,95 +190,43 @@ const Search = async (term: string, types?: string, limit?: number): Promise<Mus
   return resp.data.results;
 };
 
-const GetRelationships = async (collection: MusicKit.MediaItem[], type: string): Promise<MusicKit.MediaItem[]> => {
+const GetRelationships = async (collection: MusicKit.MediaItem[]): Promise<MusicKit.MediaItem[]> => {
   if (!collection) {
     return [];
   }
-  collection = [...collection];
+  // collection = cloneDeep(collection);
 
-  let ids: string[];
-  let results: MusicKit.Resource[];
+  const albumsIds = collection
+    .filter((item: MusicKit.MediaItem) => item.type === 'albums')
+    .map((item: MusicKit.MediaItem) => item.id);
+  const playlistIds = collection
+    .filter((item: MusicKit.MediaItem) => item.type === 'playlists')
+    .map((item: MusicKit.MediaItem) => item.id);
+  const songIds = collection
+    .filter((item: MusicKit.MediaItem) => item.type === 'songs')
+    .map((item: MusicKit.MediaItem) => item.id);
 
-  switch (type) {
-    case 'albums': {
-      ids = collection.filter((i: MusicKit.MediaItem) => i.type === 'albums').map((i: MusicKit.MediaItem) => i.id);
+  const albumsPromise = albumsIds?.length > 0 ? Albums(albumsIds, 'artists') : null;
+  const playlistsPromise = playlistIds?.length > 0 ? Playlists(playlistIds, 'curators') : null;
+  const songsPromise = songIds?.length > 0 ? Songs(songIds, 'artists,albums') : null;
 
-      if (!ids || ids.length === 0) {
-        return [];
-      }
+  const results = await Promise.all([albumsPromise, playlistsPromise, songsPromise]);
 
-      await Albums(ids, 'artists').then((res) => {
-        results = res;
-
-        for (const item of collection.filter((i: MusicKit.MediaItem) => i.type === 'albums')) {
-          let index = 0;
-
-          for (const result of results) {
-            if (item.id === result.id && result.relationships.artists.data.length) {
-              collection.filter((i: MusicKit.MediaItem) => i.type === 'albums')[index].relationships =
-                result.relationships;
-              break;
-            }
-
-            index++;
-          }
-        }
-      });
-
-      return collection;
+  collection.map((item: MusicKit.MediaItem) => {
+    switch (item.type) {
+      case 'albums':
+        item.relationships = results[0]?.find((i: MusicKit.MediaItem) => i.id === item.id)?.relationships;
+        break;
+      case 'playlists':
+        item.relationships = results[1]?.find((i: MusicKit.MediaItem) => i.id === item.id)?.relationships;
+        break;
+      case 'songs':
+        item.relationships = results[2]?.find((i: MusicKit.MediaItem) => i.id === item.id)?.relationships;
+        break;
     }
-    case 'playlists': {
-      ids = collection.filter((i: MusicKit.MediaItem) => i.type === 'playlists').map((i: MusicKit.MediaItem) => i.id);
+  });
 
-      if (!ids || ids.length === 0) {
-        return [];
-      }
-
-      await Playlists(ids, 'curators').then((res) => {
-        results = res;
-
-        for (const item of collection.filter((i: MusicKit.MediaItem) => i.type === 'playlists')) {
-          let index = 0;
-
-          for (const result of results) {
-            if (item.id === result.id && result.relationships.curator.data.length) {
-              collection.filter((i: MusicKit.MediaItem) => i.type === 'playlists')[index].relationships =
-                result.relationships;
-              break;
-            }
-
-            index++;
-          }
-        }
-      });
-
-      return collection;
-    }
-    case 'songs': {
-      ids = collection.map((i) => i.id);
-
-      if (!ids || ids.length === 0) {
-        return [];
-      }
-
-      await Songs(ids, 'artists,albums').then((res) => {
-        results = res;
-
-        for (const item of collection) {
-          for (const result of results) {
-            if (item.id === result.id) {
-              item.relationships = result.relationships;
-              break;
-            }
-          }
-        }
-      });
-
-      return collection;
-    }
-  }
-
-  return [];
+  return collection;
 };
 
 const MusicKitApiService: MusicKitApiService = {
