@@ -1,10 +1,10 @@
 import React from 'react';
-import { AiOutlineLoading } from 'react-icons/ai';
+import { IconLoading } from '../../icons';
 import styled, { keyframes } from 'styled-components';
 
 const LoadingSpinner = (): JSX.Element => {  
   return (
-    <LoadingContainer><AiOutlineLoading /></LoadingContainer>
+    <LoadingContainer><IconLoading /></LoadingContainer>
   );
 }
 

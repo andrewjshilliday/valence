@@ -4,6 +4,6 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-  primary: '#040305',
-  onPrimary: '#EEEEEE'
+  primary: '#181a1b',
+  onPrimary: '#e8e6e3'
 };

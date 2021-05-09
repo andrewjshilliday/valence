@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import cloneDeep from 'lodash.clonedeep';
 declare const MusicKit: any;
 const APPLE_MUSIC_API = import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_API;
 
@@ -124,38 +125,25 @@ const Playlists = async (ids: string[], include?: string): Promise<MusicKit.Medi
   return resp.data.data;
 };
 
-const RecentPlayed = async (/* includeAll: boolean = true,  */ nextUrl?: string): Promise<MusicKit.Resource> => {
+const RecentPlayed = async (nextUrl?: string): Promise<MusicKit.Resource> => {
   const url = `${APPLE_MUSIC_API}${nextUrl ?? '/v1/me/recent/played'}`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
   return resp.data;
-
-  /* const results: any[] = []; 
-
-  const fetch = async (url: string = `${APPLE_MUSIC_API}/v1/me/recent/played`) => {
-    const resp = await axios.get(url, { headers: GetHeaders() });
-    results.push(...resp.data.data);
-
-    if (includeAll && resp.data.next) {
-      await fetch(`${APPLE_MUSIC_API}${resp.data.next}`);
-    }
-  }
-
-  await fetch();
-
-  return results; */
 };
 
 const Recommendations = async (): Promise<any> => {
   const url = `${APPLE_MUSIC_API}/v1/me/recommendations`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
-  console.log(resp.data);
   return resp.data.data;
 };
 
 const Resource = async (resourceUrl: string): Promise<MusicKit.Resource> => {
-  const resp = await axios.get(`${APPLE_MUSIC_API}${resourceUrl}`, { headers: GetHeaders() });
+  const source = axios.CancelToken.source();
+  const promise: any = axios.get(`${APPLE_MUSIC_API}${resourceUrl}`, { headers: GetHeaders() });
+  promise.cancel = () => source.cancel(`Request to ${resourceUrl} cancelled`);
+  const resp = await promise;
   return resp.data;
 };
 
@@ -194,7 +182,7 @@ const GetRelationships = async (collection: MusicKit.MediaItem[]): Promise<Music
   if (!collection) {
     return [];
   }
-  // collection = cloneDeep(collection);
+  collection = cloneDeep(collection);
 
   const albumsIds = collection
     .filter((item: MusicKit.MediaItem) => item.type === 'albums')

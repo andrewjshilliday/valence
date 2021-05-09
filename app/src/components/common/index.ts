@@ -5,6 +5,6 @@ export { default as LoadingSpinner } from './LoadingSpinner/LoadingSpinner';
 export { default as MediaItemCard } from './MediaItemCard/MediaItemCard';
 export { default as MediaItemCarousel } from './MediaItemCarousel/MediaItemCarousel';
 export { default as MediaItemGrid } from './MediaItemGrid/MediaItemGrid';
-export { default as MediaItemList } from './MediaItemList/MediaItemList';
 export { default as ProgressBar } from './ProgressBar/ProgressBar';
 export { default as SearchBar } from './SearchBar/SearchBar';
+export { default as TrackList } from './TrackList/TrackList';

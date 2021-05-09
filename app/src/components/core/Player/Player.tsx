@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import shallow from 'zustand/shallow';
-import { BsMusicNoteBeamed } from 'react-icons/bs';
+import { IconMusic } from '../../icons';
 import { useMusicKit } from '../../providers';
 import { usePlayerStore } from '../../../store';
 import { NowPlaying, PlaybackControls, PlayerOptions, PlaybackProgress } from '.';
@@ -106,7 +106,7 @@ const StyledPlayerContainer = styled.div<{ hasNowPlayingItem: boolean }>`
         `};
 `;
 
-const StyledLogo = styled(BsMusicNoteBeamed)`
+const StyledLogo = styled(IconMusic)`
   height: 3rem;
   width: 3rem;
   margin: 0 0.75rem;

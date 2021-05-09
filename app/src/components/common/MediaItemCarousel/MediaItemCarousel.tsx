@@ -1,6 +1,7 @@
 import React, { useEffect, createRef } from 'react';
 import styled from 'styled-components';
 import { MediaItemCard } from '../../common';
+import { IconChevronLeft, IconChevronRight } from '../../icons';
 import arrow from '../../../assets/images/arrow.svg';
 
 type MediaItemCarouselProps = {
@@ -59,7 +60,7 @@ const MediaItemCarousel = ({ items, title }: MediaItemCarouselProps): JSX.Elemen
     <CarouselContainer>
       {title && <h2>{title}</h2>}
       <MediaItemsContainer>
-        <LeftIcon ref={leftIconRef} onClick={() => scroll('left')}></LeftIcon>
+        <StyledBack ref={leftIconRef} onClick={() => scroll('left')}></StyledBack>
         <MediaItemCollection ref={rowRef}>
           {
             items.length && items.every((item: MusicKit.MediaItem) => item.attributes) ? (
@@ -76,7 +77,7 @@ const MediaItemCarousel = ({ items, title }: MediaItemCarouselProps): JSX.Elemen
             )) */
           }
         </MediaItemCollection>
-        <RightIcon ref={rightIconRef} onClick={() => scroll('right')}></RightIcon>
+        <StyledForward ref={rightIconRef} onClick={() => scroll('right')}></StyledForward>
       </MediaItemsContainer>
     </CarouselContainer>
   );
@@ -94,7 +95,7 @@ const MediaItemsContainer = styled.div`
   display: flex;
   width: 100%;
 `;
-const LeftIcon = styled.div`
+const StyledBack = styled.div`
   display: inline-block;
   width: 35px;
 
@@ -116,7 +117,7 @@ const LeftIcon = styled.div`
     }
   }
 `;
-const RightIcon = styled(LeftIcon)`
+const StyledForward = styled(StyledBack)`
   &::before {
     float: right;
     transform: rotate(180deg);

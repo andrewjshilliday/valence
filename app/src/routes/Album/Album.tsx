@@ -1,9 +1,9 @@
-import React, { createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { createRef, useLayoutEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
 import styled from 'styled-components';
-import { LoadingSpinner, MediaItemCarousel, MediaItemList } from '../../components/common';
+import { LoadingSpinner, MediaItemCarousel, TrackList } from '../../components/common';
 import { MusicKitApiService, MusicKitService, ValenceApiService } from '../../services';
 
 type AlbumRouterProps = {
@@ -15,7 +15,6 @@ type AlbumRouterProps = {
 
 const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
   const id = props.match.params.id;
-  const [hasMultipleDiscs, setHasMultipleDiscs] = useState(false);
   const notesRef = createRef<HTMLDivElement>();
 
   const { isLoading: valenceLoading, error: valenceError, data: valenceAlbum } = useQuery<MusicKit.MediaItem>(
@@ -61,12 +60,6 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
 
   const otherAlbums = useMemo(getOtherAlbums, [album]);
 
-  useEffect(() => {
-    setHasMultipleDiscs(
-      album?.relationships.tracks.data.some((track: MusicKit.MediaItem) => track.attributes.discNumber === 2)
-    );
-  }, [album]);
-
   useLayoutEffect(() => {
     setEditorialNotesStyle();
     window.addEventListener('resize', setEditorialNotesStyle);
@@ -80,22 +73,21 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
 
     const notesOffsetTop = notesRef.current.getBoundingClientRect().top;
     notesRef.current.style.maxHeight = `${window.innerHeight - notesOffsetTop - 150}px`;
-    // notesRef.current.style.maxHeight = `${height - 150 - 10 - notesRef.current.clientWidth - 23 - 150}px`;
   };
 
   if (!album || valenceLoading || musicKitLoading) {
     return (
-      <LoadingContainer>
+      <StyledLoading>
         <LoadingSpinner />
-      </LoadingContainer>
+      </StyledLoading>
     );
   }
 
   return (
-    <AlbumContainer>
-      <AlbumTracksContainer>
-        <SidebarContainer>
-          <StickySidebar>
+    <StyledAlbumContainer>
+      <StyledAlbumTracksContainer>
+        <StyledSidebarContainer>
+          <StyledStickySidebar>
             <StyledImageContainer>
               <StyledImage
                 src={MusicKitService.FormatArtwork(album.attributes.artwork, 500)}
@@ -108,62 +100,53 @@ const Album = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
             {album.attributes.editorialNotes && (
               <>
                 <hr />
-                <EditorialNotes ref={notesRef}>
+                <StyledEditorialNotes ref={notesRef}>
                   <span
                     dangerouslySetInnerHTML={{
                       __html: `${album.attributes.editorialNotes.standard ?? album.attributes.editorialNotes.short}`
                     }}
                   ></span>
-                </EditorialNotes>
+                </StyledEditorialNotes>
               </>
             )}
-          </StickySidebar>
-        </SidebarContainer>
-        <TrackListContainer>
-          <TrackListHeader>
+          </StyledStickySidebar>
+        </StyledSidebarContainer>
+        <StyledTrackListContainer>
+          <StyledTrackListHeader>
             <h1 className="text-truncate">{album.attributes.name}</h1>
-            <ArtistGenre>
-              <Link to={`/artist/${album.relationships.artists.data[0].id}`}>
-                <h2 className="text-truncate">{album.attributes.artistName}</h2>
-              </Link>
-              <h2>{album.attributes.genreNames && <>&nbsp;| {album.attributes.genreNames[0]}</>}</h2>
-            </ArtistGenre>
-          </TrackListHeader>
-          {!hasMultipleDiscs ? (
-            <MediaItemList collection={album} items={album.relationships.tracks.data} />
-          ) : (
-            [
-              ...new Set(
-                album.relationships.tracks.data.map((track: MusicKit.MediaItem) => track.attributes.discNumber)
-              )
-            ].map((discNumber: unknown) => (
-              <div key={`disc${discNumber}`}>
-                <strong>Disc {discNumber}</strong>
-                <MediaItemList
-                  collection={album}
-                  items={album.relationships.tracks.data.filter(
-                    (track: MusicKit.MediaItem) => track.attributes.discNumber === discNumber
-                  )}
-                />
-              </div>
-            ))
-          )}
-          <ReleaseDate>
+            <StyledArtistGenre>
+              <h2 className="text-truncate">
+                {album.relationships.artists?.data.length ? (
+                  <Link to={`/artist/${album.relationships.artists.data[0].id}`}>{album.attributes.artistName}</Link>
+                ) : (
+                  album.attributes.artistName
+                )}
+              </h2>
+              <h2 className="text-truncate">
+                {album.attributes.genreNames && <>&nbsp;| {album.attributes.genreNames[0]}</>}
+              </h2>
+            </StyledArtistGenre>
+          </StyledTrackListHeader>
+          <TrackList collection={album} showArtist={album.attributes.artistName === 'Various Artists'} />
+          <StyledReleaseDate>
             Released: {moment(album.attributes.releaseDate).format('dddd, MMMM D, YYYY')} <br />
             {album.attributes.recordLabel} | {album.attributes.copyright}
-          </ReleaseDate>
-        </TrackListContainer>
-      </AlbumTracksContainer>
+          </StyledReleaseDate>
+        </StyledTrackListContainer>
+      </StyledAlbumTracksContainer>
       {otherAlbums.map(
-        (category: any) => category.data.length > 0 && <MediaItemCarousel key={category.title} items={category.data} title={category.title} />
+        (category: any) =>
+          category.data.length > 0 && (
+            <MediaItemCarousel key={category.title} items={category.data} title={category.title} />
+          )
       )}
-    </AlbumContainer>
+    </StyledAlbumContainer>
   );
 };
 
 export default Album;
 
-const LoadingContainer = styled.div`
+const StyledLoading = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
@@ -171,39 +154,47 @@ const LoadingContainer = styled.div`
   align-items: center;
 `;
 
-const AlbumContainer = styled.div``;
-const AlbumTracksContainer = styled.div`
-  display: flex;
+const StyledAlbumContainer = styled.div``;
+
+const StyledAlbumTracksContainer = styled.div`
+  display: grid;
+  grid-template-columns: clamp(250px, 30%, 400px) auto;
+  grid-template-areas: 'sidebar tracklist';
 `;
-const SidebarContainer = styled.div`
-  width: 30%;
-  min-width: 250px;
-  max-width: 400px;
+
+const StyledSidebarContainer = styled.div`
+  grid-area: sidebar;
   padding: 10px 15px;
 `;
-const StickySidebar = styled.div`
+
+const StyledStickySidebar = styled.div`
   position: sticky;
   top: 10px;
 `;
-const EditorialNotes = styled.div`
+
+const StyledEditorialNotes = styled.div`
   overflow: auto;
   font-size: 10pt;
 `;
-const TrackListContainer = styled.div`
-  width: 70%;
-  padding-left: 15px;
+
+const StyledTrackListContainer = styled.div`
+  grid-area: tracklist;
+  padding: 0 15px;
 `;
-const TrackListHeader = styled.div`
+
+const StyledTrackListHeader = styled.div`
   position: sticky;
   top: 0;
   padding-bottom: 10px;
-  background: #040305;
+  background: ${(props) => props.theme.primary};
 `;
-const ReleaseDate = styled.p`
+
+const StyledReleaseDate = styled.p`
   font-size: 10pt;
   margin: 0 15px;
 `;
-const ArtistGenre = styled.div`
+
+const StyledArtistGenre = styled.div`
   display: flex;
 `;
 

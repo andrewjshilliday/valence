@@ -1,8 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { AiOutlineLoading } from 'react-icons/ai';
-import { MdPlayArrow, MdPause, MdSkipPrevious, MdSkipNext } from 'react-icons/md';
 import { IconButton } from '../../../common';
+import { IconLoading, IconNext, IconPause, IconPlay, IconPrevious } from '../../../icons';
 
 interface PlaybackControlProps extends React.HTMLAttributes<HTMLDivElement> {
   isPlaybackLoading: boolean;
@@ -26,15 +25,15 @@ const PlaybackControls = ({
 }: PlaybackControlProps): JSX.Element => {
   return (
     <StyledPlaybackControls className={className}>
-      <StyledPreviousIcon icon={<MdSkipPrevious />} onClick={() => previous()} variant={'secondary'} />
-      {isPlaying && <StyledPauseIcon icon={<MdPause />} onClick={() => pause()} variant={'secondary'} />}
+      <StyledPreviousIcon icon={<IconPrevious />} onClick={() => previous()} variant={'secondary'} />
+      {isPlaying && <StyledPauseIcon icon={<IconPause />} onClick={() => pause()} variant={'secondary'} />}
       {!isPlaying && !isPlaybackLoading && (
-        <StyledPlayIcon icon={<MdPlayArrow />} onClick={() => play()} variant={'secondary'} />
+        <StyledPlayIcon icon={<IconPlay />} onClick={() => play()} variant={'secondary'} />
       )}
       {!isPlaying && isPlaybackLoading && (
-        <StyledLoadingIcon icon={<AiOutlineLoading />} onClick={() => stop()} variant={'secondary'} />
+        <StyledLoadingIcon icon={<IconLoading />} onClick={() => stop()} variant={'secondary'} />
       )}
-      <StyledNextIcon icon={<MdSkipNext />} onClick={() => next()} variant={'secondary'} />
+      <StyledNextIcon icon={<IconNext />} onClick={() => next()} variant={'secondary'} />
     </StyledPlaybackControls>
   );
 };

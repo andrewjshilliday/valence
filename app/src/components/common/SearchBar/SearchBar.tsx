@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { MdSearch } from 'react-icons/md';
+import { IconSearch } from '../../icons';
 
 interface SearchBarProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
@@ -13,7 +13,6 @@ const SearchBar = ({ className, showIcon = true, icon, onSearch }: SearchBarProp
 
   const handleSearch = (e: any): void => {
     if (e.keyCode === 13) {
-      console.log(value);
       onSearch(value);
     }
   };
@@ -35,7 +34,7 @@ const StyledInputContainer = styled.div`
   border: 1px ridge;
 `;
 
-const StyledSearchIcon = styled(MdSearch)`
+const StyledSearchIcon = styled(IconSearch)`
   height: 1.5rem;
   width: 1.5rem;
   margin: 0 0.5rem 0 0;

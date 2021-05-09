@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { IconChevronLeft, IconChevronRight } from '../../../icons';
 
 interface NavigationProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -25,15 +25,15 @@ const StyledNavigation = styled.div`
 `;
 
 const arrowStyles = css`
-  height: 2rem;
-  width: 2rem;
+  height: 1rem;
+  width: 1rem;
 `;
 
-const StyledBackArrow = styled(MdChevronLeft)`
+const StyledBackArrow = styled(IconChevronLeft)`
   ${arrowStyles}
 `;
 
-const StyledForwardArrow = styled(MdChevronRight)`
+const StyledForwardArrow = styled(IconChevronRight)`
   ${arrowStyles}
 `;
 

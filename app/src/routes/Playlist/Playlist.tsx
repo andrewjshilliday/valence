@@ -1,9 +1,10 @@
-import React, { createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { createRef, useLayoutEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { Link, RouteComponentProps } from 'react-router-dom';
+import cloneDeep from 'lodash.clonedeep';
 import moment from 'moment';
 import styled from 'styled-components';
-import { LoadingSpinner, MediaItemCarousel, MediaItemList } from '../../components/common';
+import { LoadingSpinner, MediaItemCarousel, TrackList } from '../../components/common';
 import { MusicKitApiService, MusicKitService, ValenceApiService } from '../../services';
 
 type PlaylistRouterProps = {
@@ -15,15 +16,36 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
   const notesRef = createRef<HTMLDivElement>();
 
   const { isLoading: valenceLoading, error: valenceError, data: valencePlaylist } = useQuery<MusicKit.MediaItem>(
-    `valenceAlbumData-${id}`,
+    `playlistValenceData-${id}`,
     () => ValenceApiService.Playlist(id)
   );
   const { isLoading: musicKitLoading, error: musicKitError, data: musicKitPlaylist } = useQuery<MusicKit.MediaItem>(
-    `musicKitAlbumData-${id}`,
+    `playlistMusicKitData-${id}`,
     () => MusicKitApiService.Playlist(id)
   );
 
-  const playlist = useMemo(() => valencePlaylist ?? musicKitPlaylist, [valencePlaylist, musicKitPlaylist]);
+  const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery(
+    `playlistRelationshipsData-${id}`,
+    async (): Promise<MusicKit.MediaItem | undefined> => {
+      if (!playlist) {
+        return;
+      }
+
+      const playlistRelationships = cloneDeep(playlist);
+      playlistRelationships.relationships.tracks.data = await MusicKitApiService.GetRelationships(
+        playlist?.relationships.tracks.data
+      );
+
+      return playlistRelationships;
+    },
+    { enabled: !valenceLoading && !musicKitLoading }
+  );
+
+  const playlist = useMemo(() => relationshipsData ?? valencePlaylist ?? musicKitPlaylist, [
+    relationshipsData,
+    valencePlaylist,
+    musicKitPlaylist
+  ]);
 
   const getPlaylistDuration = () => {
     if (!playlist) {
@@ -61,17 +83,17 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
 
   if (!playlist || valenceLoading || musicKitLoading) {
     return (
-      <LoadingContainer>
+      <StyledLoading>
         <LoadingSpinner />
-      </LoadingContainer>
+      </StyledLoading>
     );
   }
 
   return (
-    <PlaylistContainer>
-      <PlaylistTracksContainer>
-        <SidebarContainer>
-          <StickySidebar>
+    <StyledPlaylistContainer>
+      <StyledPlaylistTracksContainer>
+        <StyledSidebarContainer>
+          <StyledStickySidebar>
             <StyledImageContainer>
               <StyledImage
                 src={MusicKitService.FormatArtwork(playlist.attributes.artwork, 500)}
@@ -84,7 +106,7 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
             {playlist.attributes.editorialNotes && (
               <>
                 <hr />
-                <EditorialNotes ref={notesRef}>
+                <StyledEditorialNotes ref={notesRef}>
                   <span
                     dangerouslySetInnerHTML={{
                       __html: `${
@@ -92,42 +114,47 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
                       }`
                     }}
                   ></span>
-                </EditorialNotes>
+                </StyledEditorialNotes>
               </>
             )}
-          </StickySidebar>
-        </SidebarContainer>
-        <TrackListContainer>
-          <TrackListHeader>
+          </StyledStickySidebar>
+        </StyledSidebarContainer>
+        <StyledTrackListContainer>
+          <StyledTrackListHeader>
             <h1 className="text-truncate">{playlist.attributes.name}</h1>
-            <ArtistGenre>
-              {playlist.relationships.curator.data.length ? (
-                <Link to={`/curators/${playlist.relationships.curator.data[0].id}`}>
-                  <h2 className="text-truncate">{playlist.attributes.curatorName}</h2>
-                </Link>
-              ) : (
-                <h2 className="text-truncate">{playlist.attributes.curatorName}</h2>
-              )}
-              <h2>
-                {playlist.attributes.lastModifiedDate && (
-                  <>&nbsp;| {moment(playlist.attributes.lastModifiedDate).format('dddd, MMMM D, YYYY')}</>
+            <StyledCuratorUpdated>
+              <h2 className="text-truncate">
+                {playlist.relationships.curator.data.length ? (
+                  <Link to={`/curators/${playlist.relationships.curator.data[0].id}`}>
+                    {playlist.attributes.curatorName}
+                  </Link>
+                ) : (
+                  playlist.attributes.curatorName
                 )}
               </h2>
-            </ArtistGenre>
-          </TrackListHeader>
-          <MediaItemList collection={playlist} items={playlist.relationships.tracks.data} showArtist showAlbum />
-        </TrackListContainer>
-      </PlaylistTracksContainer>
+              <h2 className="text-truncate">
+                {playlist.attributes.lastModifiedDate && (
+                  <span title={moment(playlist.attributes.lastModifiedDate).format('dddd, MMMM D, YYYY')}>
+                    &nbsp;| Updated {moment(playlist.attributes.lastModifiedDate).fromNow()}
+                  </span>
+                )}
+              </h2>
+            </StyledCuratorUpdated>
+          </StyledTrackListHeader>
+          <TrackList collection={playlist} showArtist showAlbum />
+        </StyledTrackListContainer>
+      </StyledPlaylistTracksContainer>
       {playlist.views?.['featured-artists'].data?.length > 0 && (
         <MediaItemCarousel items={playlist.views['featured-artists'].data} title={`Featured Artists`} />
       )}
-    </PlaylistContainer>
+    </StyledPlaylistContainer>
   );
 };
 
 export default Playlist;
 
-const LoadingContainer = styled.div`
+
+const StyledLoading = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
@@ -135,39 +162,42 @@ const LoadingContainer = styled.div`
   align-items: center;
 `;
 
-const PlaylistContainer = styled.div``;
-const PlaylistTracksContainer = styled.div`
-  display: flex;
+const StyledPlaylistContainer = styled.div``;
+
+const StyledPlaylistTracksContainer = styled.div`
+  display: grid;
+  grid-template-columns: clamp(250px, 30%, 400px) auto;
+  grid-template-areas: 'sidebar tracklist';
 `;
-const SidebarContainer = styled.div`
-  width: 30%;
-  min-width: 250px;
-  max-width: 400px;
+
+const StyledSidebarContainer = styled.div`
+  grid-area: sidebar;
   padding: 10px 15px;
 `;
-const StickySidebar = styled.div`
+
+const StyledStickySidebar = styled.div`
   position: sticky;
   top: 10px;
 `;
-const EditorialNotes = styled.div`
+
+const StyledEditorialNotes = styled.div`
   overflow: auto;
   font-size: 10pt;
 `;
-const TrackListContainer = styled.div`
-  width: 70%;
-  padding-left: 15px;
+
+const StyledTrackListContainer = styled.div`
+  grid-area: tracklist;
+  padding: 0 15px;
 `;
-const TrackListHeader = styled.div`
+
+const StyledTrackListHeader = styled.div`
   position: sticky;
   top: 0;
   padding-bottom: 10px;
-  background: #040305;
+  background: ${(props) => props.theme.primary};
 `;
-const ReleaseDate = styled.p`
-  font-size: 10pt;
-  margin: 0 15px;
-`;
-const ArtistGenre = styled.div`
+
+const StyledCuratorUpdated = styled.div`
   display: flex;
 `;
 

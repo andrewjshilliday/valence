@@ -3,12 +3,29 @@ import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 
 interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
   closeOnMenuClick?: boolean;
+  maxWidth?: number | 'none';
+  minWidth?: number | 'none';
+  options: Option[];
   trigger: React.ReactNode;
 }
 
-const ContextMenu = ({ className, children, trigger, closeOnMenuClick = true }: ContextMenuProps): JSX.Element => {
+type Option = {
+  content: React.ReactNode;
+  icon?: React.ReactNode;
+  key: string;
+  nestedOptions?: Option[];
+  onClick?: () => void;
+};
+
+const ContextMenu = ({
+  className,
+  closeOnMenuClick = true,
+  maxWidth = 200,
+  minWidth = 125,
+  options,
+  trigger
+}: ContextMenuProps): JSX.Element => {
   const [showMenu, setShowMenu] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -32,7 +49,7 @@ const ContextMenu = ({ className, children, trigger, closeOnMenuClick = true }: 
     }
     if (menuRef.current.offsetLeft + menuRef.current.offsetWidth + 20 > document.body.offsetWidth) {
       const menuWidth = menuRef.current.offsetWidth;
-      setXPosition((prev) => prev - menuWidth);
+      setXPosition(document.body.offsetWidth - menuWidth - 45);
     }
   });
 
@@ -43,7 +60,7 @@ const ContextMenu = ({ className, children, trigger, closeOnMenuClick = true }: 
     }
 
     setXPosition(triggerElement.left + triggerElement.width * 0.5);
-    setYPosition(triggerElement.top + triggerElement.height * 0.8);
+    setYPosition(triggerElement.top + triggerElement.height * 1.1);
     setShowMenu(!showMenu);
   };
 
@@ -62,8 +79,20 @@ const ContextMenu = ({ className, children, trigger, closeOnMenuClick = true }: 
       </div>
       {showMenu &&
         ReactDOM.createPortal(
-          <StyledContextMenu ref={menuRef} className={className} x={xPosition} y={yPosition}>
-            {children}
+          <StyledContextMenu
+            ref={menuRef}
+            className={className}
+            minWidth={minWidth}
+            maxWidth={maxWidth}
+            x={xPosition}
+            y={yPosition}
+          >
+            {options?.map((option: Option) => (
+              <StyledOption key={option.key} className={'text-truncate'} hasIcon={option.icon != null}>
+                <StyledContent className={'text-truncate'}>{option.content}</StyledContent>
+                {option.icon && <StyledIcon>{option.icon}</StyledIcon>}
+              </StyledOption>
+            ))}
           </StyledContextMenu>,
           document.body
         )}
@@ -71,37 +100,63 @@ const ContextMenu = ({ className, children, trigger, closeOnMenuClick = true }: 
   );
 };
 
-const StyledContextMenu = styled.div<{ x: number; y: number }>`
+export default ContextMenu;
+
+const StyledContextMenu = styled.div<{ maxWidth: number | 'none'; minWidth: number | 'none'; x: number; y: number }>`
   position: absolute;
-  top: ${({ y }) => y}px;
-  left: ${({ x }) => x}px;
+  ${({ x, y }) => `
+    top: ${y}px;
+    left: ${x}px;
+  `};
+  /* transform: ${({ x, y }) => `translate(${x}px, ${y}px)`}; */
+  line-height: 2.25rem;
+  font-size: 0.9rem;
+  border-color: #8c8273;
   border-radius: 0.5rem;
+  max-width: ${({ maxWidth }) => (typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth)};
+  min-width: ${({ minWidth }) => (typeof minWidth === 'number' ? `${minWidth}px` : minWidth)};
   z-index: 1000;
   background: transparent;
   backdrop-filter: saturate(75%) blur(5px);
   box-shadow: inset 0 0 0 200px rgba(255, 255, 255, 0.15);
 
-  > * {
-    display: block;
-    text-decoration: none;
-    padding: 0 1rem;
-    color: rgba(232, 230, 227, 0.95);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-
-    :hover {
-      cursor: pointer;
-      background-color: rgba(48, 52, 54, 0.7);
-    }
-
-    :first-child {
-      border-radius: 0.5rem 0.5rem 0 0;
-    }
-
-    :last-child {
-      border-bottom: none;
-      border-radius: 0 0 0.5rem 0.5rem;
-    }
+  @-moz-document url-prefix() {
+    background: #171819;
   }
 `;
 
-export default ContextMenu;
+const StyledOption = styled.div<{ hasIcon: boolean }>`
+  display: grid;
+  grid-template-columns: ${({ hasIcon }) => (hasIcon ? `auto 16px` : `auto`)};
+  grid-template-areas: '${({ hasIcon }) => (hasIcon ? `content icon` : `content`)}';
+  gap: 10px;
+  text-decoration: none;
+  padding: 0 1rem;
+  color: rgba(232, 230, 227, 0.95);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+
+  :hover {
+    cursor: pointer;
+    background-color: rgba(48, 52, 54, 0.7);
+  }
+
+  :first-child {
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  :last-child {
+    border-bottom: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+  }
+`;
+
+const StyledContent = styled.div`
+  grid-area: content;
+`;
+
+const StyledIcon = styled.div`
+  grid-area: icon;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;

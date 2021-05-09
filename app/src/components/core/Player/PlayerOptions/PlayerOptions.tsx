@@ -1,11 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { MdStar, MdStarBorder } from 'react-icons/md';
-import { BiVolumeFull, BiVolumeLow, BiVolumeMute } from 'react-icons/bi';
-import { IoMdHeart, IoMdHeartEmpty, IoMdHeartDislike } from 'react-icons/io';
-import { TiArrowRepeat, TiArrowShuffle } from 'react-icons/ti';
-import { VscListSelection } from 'react-icons/vsc';
 import { IconButton } from '../../../common';
+import { IconHeartEmpty, IconHeartFull, IconList, IconRepeat, IconShuffle, IconVolumeHigh } from '../../../icons';
 
 interface PlaybackOptionsProps extends React.HTMLAttributes<HTMLDivElement> {
   isFavourite: boolean;
@@ -26,15 +22,15 @@ const PlaybackOptions = ({
   toggleShuffle
 }: PlaybackOptionsProps): JSX.Element => (
   <StyledPlaybackControls className={className}>
-    <StyledVolumeIcon icon={<BiVolumeFull />} variant={'secondary'} onClick={setVolume(0.1)} />
-    <StyledShuffleIcon icon={<TiArrowShuffle />} variant={'secondary'} onClick={toggleShuffle} />
-    <StyledRepeatIcon icon={<TiArrowRepeat />} variant={'secondary'} onClick={toggleRepeat} />
+    <StyledVolumeIcon icon={<IconVolumeHigh />} variant={'secondary'} onClick={setVolume(0.1)} />
+    <StyledShuffleIcon icon={<IconShuffle />} variant={'secondary'} onClick={toggleShuffle} />
+    <StyledRepeatIcon icon={<IconRepeat />} variant={'secondary'} onClick={toggleRepeat} />
     <StyledFavouriteIcon
-      icon={isFavourite ? <IoMdHeart /> : <IoMdHeartEmpty />}
+      icon={isFavourite ? <IconHeartFull /> : <IconHeartEmpty />}
       variant={'secondary'}
       onClick={toggleFavourite}
     />
-    <StyledLyricsIcon icon={<VscListSelection />} variant={'secondary'} onClick={showLyrics} />
+    <StyledLyricsIcon icon={<IconList />} variant={'secondary'} onClick={showLyrics} />
   </StyledPlaybackControls>
 );
 

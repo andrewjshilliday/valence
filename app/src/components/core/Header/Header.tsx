@@ -1,12 +1,10 @@
 import React from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { BsMusicNoteBeamed } from 'react-icons/bs';
-import { FaUser } from 'react-icons/fa';
-import { IoMdNotifications } from 'react-icons/io';
+import { Button, ContextMenu, IconButton, SearchBar } from '../../common';
+import { IconMusic, IconNotification, IconProfile, IconSettings } from '../../icons';
 import { useAuthorization } from '../../providers';
 import { useAuthStore } from '../../../store';
-import { Button, ContextMenu, IconButton, SearchBar } from '../../common';
 import Navigation from './Navigation/Navigation';
 
 interface HeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -31,10 +29,21 @@ const Header = ({ className }: HeaderProps): JSX.Element => {
         {isAuthorized ? (
           <>
             <IconButton icon={<StyledNotifications />} />
-            <StyledProfileContextMenu trigger={<IconButton icon={<StyledProfile />} />}>
-              <Link to={'/settings'}>Settings</Link>
-              <span onClick={() => auth.signOut()}>Sign Out</span>
-            </StyledProfileContextMenu>
+            <StyledProfileContextMenu
+              trigger={<IconButton icon={<StyledProfile />}/>}
+              options={[
+                {
+                  content: <Link to={'/settings'}>Settings</Link>,
+                  icon: <IconSettings />,
+                  key: 'settings-link'
+                },
+                {
+                  content: 'Sign Out',
+                  key: 'sign-out-button',
+                  onClick: () => auth.signOut()
+                }
+              ]}
+            />
           </>
         ) : (
           <Button onClick={() => auth.signIn()}>Sign In</Button>
@@ -51,7 +60,7 @@ const StyledHeader = styled.header`
   padding: 1rem;
 `;
 
-const StyledLogo = styled(BsMusicNoteBeamed)`
+const StyledLogo = styled(IconMusic)`
   height: 3rem;
   width: 3rem;
   margin-left: 2rem;
@@ -73,15 +82,10 @@ const StyledAccountContainer = styled.div`
   }
 `;
 
-const StyledProfileContextMenu = styled(ContextMenu)`
-  > * {
-    line-height: 2.25rem;
-    font-size: 0.9rem;
-  }
-`;
+const StyledProfileContextMenu = styled(ContextMenu)``;
 
-const StyledProfile = styled(FaUser)``;
+const StyledProfile = styled(IconProfile)``;
 
-const StyledNotifications = styled(IoMdNotifications)``;
+const StyledNotifications = styled(IconNotification)``;
 
 export default Header;

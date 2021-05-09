@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { HiHome } from 'react-icons/hi';
-import { TiThLargeOutline } from 'react-icons/ti';
-import { RiPlayListFill } from 'react-icons/ri';
+import { IconBrowse, IconHome, IconPlaylist } from '../../icons';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -13,15 +11,15 @@ const Sidebar = ({ className }: SidebarProps): JSX.Element => {
   return (
     <StyledAside className={className}>
       <StyledHomeLink to={'/home'} className={location.pathname === '/home' ? 'active' : ''}>
-        <HiHome />
+        <IconHome />
         <span>Home</span>
       </StyledHomeLink>
       <StyledBrowseLink to={'/browse'} className={location.pathname === '/browse' ? 'active' : ''}>
-        <TiThLargeOutline />
+        <IconBrowse />
         <span>Browse</span>
       </StyledBrowseLink>
       <StyledPlaylistsLink to={'/playlists'} className={location.pathname === '/playlists' ? 'active' : ''}>
-        <RiPlayListFill />
+        <IconPlaylist />
         <span>Playlists</span>
       </StyledPlaylistsLink>
     </StyledAside>
@@ -42,7 +40,7 @@ const iconStyles = css`
   align-items: center;
   position: relative;
   margin: 1rem 2rem;
-  color: ${(props) => props.theme.onPrimary};
+  color: ${props => props.theme.onPrimary};
   line-height: 0.5rem;
   text-decoration: none;
 

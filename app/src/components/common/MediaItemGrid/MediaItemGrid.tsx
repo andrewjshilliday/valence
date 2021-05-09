@@ -63,13 +63,13 @@ const MediaItemGrid = ({ items, showArtwork, showArtist, showAlbum, title }: Med
     <StyledGridContainer>
       {title && <h2>{title}</h2>}
       <StyledMediaItemContainer>
-        <LeftIcon ref={leftIconRef} onClick={() => scroll('left')} />
+        <StyledLeftIcon ref={leftIconRef} onClick={() => scroll('left')} />
         <StyledMediaItemCollctions ref={rowRef} count={Math.ceil(items.length / 3)}>
           {items.map((item: MusicKit.MediaItem) => (
             <MediaItem key={item.id}>
-              <Control>
+              <StyledControl>
                 <i className="fas fa-plus"></i>
-              </Control>
+              </StyledControl>
               {showArtwork && (
                 <img
                   src={MusicKitService.FormatArtwork(item.attributes.artwork, 44)}
@@ -77,23 +77,24 @@ const MediaItemGrid = ({ items, showArtwork, showArtist, showAlbum, title }: Med
                   alt={item.attributes.name}
                 />
               )}
-              <ItemName showArtist={showArtist} showAlbum={showAlbum} className="text-truncate">
+              <StyledItemName showArtist={showArtist} showAlbum={showAlbum} className="text-truncate">
                 {item.attributes.name}
-              </ItemName>
-              {showArtist && <ArtistName className="text-truncate">{item.attributes.artistName}</ArtistName>}
-              {showAlbum && <AlbumName className="track-album text-truncate">{item.attributes.albumName}</AlbumName>}
-              <Duration className="track-duration">{moment.utc(item.attributes.durationInMillis).format('m:ss')}</Duration>
+              </StyledItemName>
+              {showArtist && (
+                <StyledArtistName className="text-truncate">{item.attributes.artistName}</StyledArtistName>
+              )}
+              {showAlbum && <StyledAlbumName className="text-truncate">{item.attributes.albumName}</StyledAlbumName>}
+              <StyledDuration>{moment.utc(item.attributes.durationInMillis).format('m:ss')}</StyledDuration>
             </MediaItem>
           ))}
         </StyledMediaItemCollctions>
-        <RightIcon ref={rightIconRef} onClick={() => scroll('right')} />
+        <StyledRightIcon ref={rightIconRef} onClick={() => scroll('right')} />
       </StyledMediaItemContainer>
     </StyledGridContainer>
   );
 };
 
 export default MediaItemGrid;
-
 
 const StyledGridContainer = styled.div`
   h2 {
@@ -108,7 +109,7 @@ const StyledMediaItemContainer = styled.div`
 
 const StyledMediaItemCollctions = styled.div<{ count: number }>`
   display: grid;
-  grid-template-columns: ${props => `repeat(${props.count}, 33.333%)`};
+  grid-template-columns: ${(props) => `repeat(${props.count}, 33.333%)`};
   grid-template-rows: 33% 33% 33%;
   grid-auto-flow: column;
   overflow-x: hidden;
@@ -127,7 +128,7 @@ const MediaItem = styled.div`
   }
 `;
 
-const Control = styled.div`
+const StyledControl = styled.div`
   display: flex;
   justify-content: center;
   width: 50px;
@@ -137,55 +138,50 @@ const Control = styled.div`
   }
 `;
 
-const ItemName = styled.span<{ showArtist?: boolean; showAlbum?: boolean }>`
-  ${(props) =>
-    props.showArtist &&
-    props.showAlbum &&
-    `
-    max-width: calc(100% - 450px);
-    width: 50%;
-  `}
-  ${(props) =>
-    props.showArtist &&
-    !props.showAlbum &&
-    `
-    max-width: calc(100% - 280px);
-    width: 75%;
-  `}
-  ${(props) =>
-    !props.showArtist &&
-    props.showAlbum &&
-    `
-    max-width: calc(100% - 280px);
-    width: 75%;
-  `}
-  ${(props) =>
-    !props.showArtist &&
-    !props.showAlbum &&
-    `
-    max-width: calc(100% - 110px);
-    width: calc(100% - 110px);
-  `}
+const StyledItemName = styled.span<{ showArtist?: boolean; showAlbum?: boolean }>`
+  ${({ showArtist, showAlbum }) => {
+    if (showArtist && showAlbum) {
+      return `
+        max-width: calc(100% - 450px);
+        width: 50%;
+      `;
+    } else if (showArtist && !showAlbum) {
+      return `
+        max-width: calc(100% - 280px);
+        width: 75%;
+      `;
+    } else if (!showArtist && showAlbum) {
+      return `
+        max-width: calc(100% - 280px);
+        width: 75%;
+      `;
+    } else {
+      return `
+        max-width: calc(100% - 110px);
+        width: calc(100% - 110px);
+      `;
+    }
+  }}
 `;
 
-const ArtistName = styled.span`
+const StyledArtistName = styled.span`
   width: 25%;
   max-width: 170px;
   min-width: 90px;
 `;
 
-const AlbumName = styled.span`
+const StyledAlbumName = styled.span`
   width: 25%;
   max-width: 170px;
   min-width: 90px;
 `;
 
-const Duration = styled.span`
+const StyledDuration = styled.span`
   width: 60px;
   text-align: right;
 `;
 
-const LeftIcon = styled.div`
+const StyledLeftIcon = styled.div`
   display: inline-block;
   width: 35px;
 
@@ -208,7 +204,7 @@ const LeftIcon = styled.div`
   }
 `;
 
-const RightIcon = styled(LeftIcon)`
+const StyledRightIcon = styled(StyledLeftIcon)`
   &::before {
     float: right;
     transform: rotate(180deg);
