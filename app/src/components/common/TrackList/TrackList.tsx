@@ -48,7 +48,7 @@ const TrackList = ({ collection, showArtwork, showArtist, showAlbum }: TrackList
       <StyledTrackName className="text-truncate">{item.attributes.name}</StyledTrackName>
       {showArtist && (
         <StyledArtistName className="text-truncate">
-          {item.relationships.artists?.data.length > 0 ? (
+          {item.relationships?.artists?.data.length > 0 ? (
             <Link to={`/artist/${item.relationships.artists.data[0].id}`}>{item.attributes.artistName}</Link>
           ) : (
             item.attributes.artistName
@@ -57,7 +57,7 @@ const TrackList = ({ collection, showArtwork, showArtist, showAlbum }: TrackList
       )}
       {showAlbum && (
         <StyledAlbumName className="text-truncate">
-          {item.relationships.albums?.data.length > 0 ? (
+          {item.relationships?.albums?.data.length > 0 ? (
             <Link to={`/album/${item.relationships.albums.data[0].id}`}>{item.attributes.albumName}</Link>
           ) : (
             item.attributes.albumName

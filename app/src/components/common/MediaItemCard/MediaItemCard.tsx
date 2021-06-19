@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { MusicKitService } from '../../../services';
 import placeholder from '../../../assets/images/placeholder.jpeg';
 
@@ -12,10 +13,10 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
   const albumTemplate = (
     <>
       <Link to={`/album/${item.id}`}>
-        {/* <StyledImageDiv imageUrl={MusicKitService.FormatArtwork(item.attributes.artwork, 500)} role={'img'} /> */}
         <StyledImageContainer>
           <StyledImage
-            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
+            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
             alt={item.attributes.name}
           />
         </StyledImageContainer>
@@ -35,7 +36,8 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
       <Link to={`/playlist/${item.id}`}>
         <StyledImageContainer>
           <StyledImage
-            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
+            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
             alt={item.attributes.name}
           />
         </StyledImageContainer>
@@ -49,7 +51,8 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
       <Link to={`/artist/${item.id}`}>
         <StyledImageContainer>
           <StyledImage
-            src={MusicKitService.FormatArtwork(item.attributes.artwork, 500) ?? placeholder}
+            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
+            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
             alt={item.attributes.name}
           />
         </StyledImageContainer>
@@ -123,7 +126,7 @@ const StyledImageContainer = styled.div`
   padding-top: 100%;
 `;
 
-const StyledImage = styled.img`
+const StyledImage = styled(LazyLoadImage)`
   max-width: 100%;
   height: auto;
   border-radius: 0.5em;
@@ -131,10 +134,10 @@ const StyledImage = styled.img`
   top: 0;
 `;
 
-const StyledImageDiv = styled.div<{ imageUrl: string }>`
-  padding-top: 100%;
-  background-image: url(${({ imageUrl }) => imageUrl});
-  background-size: contain;
-  background-repeat: no-repeat;
+const StyledPlaceholder= styled.img`
+  max-width: 100%;
+  height: auto;
   border-radius: 0.5em;
+  position: absolute;
+  top: 0;
 `;

@@ -17,7 +17,7 @@ const Search = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
     MusicKitApiService.Search(query, undefined, 10)
   );
 
-  const { isIdle, data: searchDataRelationships } = useQuery<MusicKit.Resource>(
+  /* const { isIdle, data: searchDataRelationships } = useQuery<MusicKit.Resource>(
     ['searchDataRelationships', query],
     async () => {
       const newData = cloneDeep<MusicKit.Resource | undefined>(searchData);
@@ -34,9 +34,10 @@ const Search = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
     {
       enabled: !!searchData
     }
-  );
+  ); */
 
-  const searchResults = useMemo(() => searchDataRelationships ?? searchData, [searchDataRelationships, searchData]);
+  // const searchResults = useMemo(() => searchDataRelationships ?? searchData, [searchDataRelationships, searchData]);
+  const searchResults = useMemo(() => searchData, [searchData]);
 
   if (!searchResults || isLoading) {
     return (

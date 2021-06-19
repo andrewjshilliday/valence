@@ -125,7 +125,7 @@ const ProgressBar = ({
     if (value > progressBarRef.current.offsetWidth) {
       value = progressBarRef.current.offsetWidth;
     }
-    console.log(value);
+    /* console.log(value); */
   };
 
   return (

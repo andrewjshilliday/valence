@@ -46,6 +46,10 @@ declare namespace MusicKit {
      * The current storefront for the configured MusicKit instance.
      */
     readonly storefrontId: string;
+
+    nowPlayingItem: MediaItem;
+    shuffleMode: number;
+    volume: number;
     /**
      * Add an event listener for a MusicKit instance by name.
      *
@@ -76,6 +80,7 @@ declare namespace MusicKit {
      * Begins playback of the current media item.
      */
     play(): Promise<MediaItemPosition>;
+    playMediaItem(item: MediaItem): any;
     /**
      * No description available.
      */

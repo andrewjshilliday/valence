@@ -33,7 +33,7 @@ const GetHeaders = () => {
 };
 
 const Artist = async (id: string, include?: string): Promise<MusicKit.MediaItem> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists/${id}`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists/${id}?extend[artists]=artistBio,bornOrFormed,origin,isGroup&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,featured-playlists,compilation-albums,singles,full-albums`;
   let params: MusicKit.QueryParameters = {};
 
   if (include) {
@@ -45,7 +45,7 @@ const Artist = async (id: string, include?: string): Promise<MusicKit.MediaItem>
 };
 
 const Artists = async (ids: string[], include?: string): Promise<MusicKit.MediaItem[]> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists?extend[songs]=artistUrl&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,playlists,compilation-albums,singles,full-albums`;
   let response: MusicKit.MediaItem[] = [];
   const limit = 30;
   let startPosition = 0;
@@ -67,7 +67,7 @@ const Artists = async (ids: string[], include?: string): Promise<MusicKit.MediaI
 };
 
 const Album = async (id: string, include?: string): Promise<MusicKit.MediaItem> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/albums/${id}`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/albums/${id}?views=related-albums,other-versions,appears-on`;
   let params: MusicKit.QueryParameters = {};
 
   if (include) {
@@ -93,7 +93,7 @@ const Albums = async (ids: string[], include?: string): Promise<MusicKit.MediaIt
 };
 
 const HeavyRotation = async (): Promise<MusicKit.Resource> => {
-  const url = `${APPLE_MUSIC_API}/v1/me/history/heavy-rotation`;
+  const url = `${APPLE_MUSIC_API}/v1/me/history/heavy-rotation?relate[albums]=artists`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
   return resp.data;
@@ -126,14 +126,14 @@ const Playlists = async (ids: string[], include?: string): Promise<MusicKit.Medi
 };
 
 const RecentPlayed = async (nextUrl?: string): Promise<MusicKit.Resource> => {
-  const url = `${APPLE_MUSIC_API}${nextUrl ?? '/v1/me/recent/played'}`;
+  const url = `${APPLE_MUSIC_API}${nextUrl ?? '/v1/me/recent/played?relate[albums]=artists&relate[playlists]=curator'}`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
   return resp.data;
 };
 
 const Recommendations = async (): Promise<any> => {
-  const url = `${APPLE_MUSIC_API}/v1/me/recommendations`;
+  const url = `${APPLE_MUSIC_API}/v1/me/recommendations?relate[albums]=artists&relate[playlists]=curator`;
 
   const resp = await axios.get(url, { headers: GetHeaders() });
   return resp.data.data;
@@ -162,7 +162,7 @@ const Songs = async (ids: string[], include?: string): Promise<MusicKit.MediaIte
 };
 
 const Search = async (term: string, types?: string, limit?: number): Promise<MusicKit.Resource> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/search`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/search?relate[albums]=artists&relate[playlists]=curator&relate[songs]=artists,albums`;
   let params: MusicKit.QueryParameters = {
     term: term
   };

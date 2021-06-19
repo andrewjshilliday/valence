@@ -1,6 +1,7 @@
 import React, { useEffect, createRef } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { MusicKitService } from '../../../services';
 import arrow from '../../../assets/images/arrow.svg';
 
@@ -69,14 +70,13 @@ const MediaItemGrid = ({ items, showArtwork, showArtist, showAlbum, title }: Med
             <MediaItem key={item.id}>
               <StyledControl>
                 <i className="fas fa-plus"></i>
+                {showArtwork && (
+                  <StyledImage
+                    src={MusicKitService.FormatArtwork(item.attributes.artwork, 44)}
+                    alt={item.attributes.name}
+                  />
+                )}
               </StyledControl>
-              {showArtwork && (
-                <img
-                  src={MusicKitService.FormatArtwork(item.attributes.artwork, 44)}
-                  className="img-fluid rounded"
-                  alt={item.attributes.name}
-                />
-              )}
               <StyledItemName showArtist={showArtist} showAlbum={showAlbum} className="text-truncate">
                 {item.attributes.name}
               </StyledItemName>
@@ -112,6 +112,7 @@ const StyledMediaItemCollctions = styled.div<{ count: number }>`
   grid-template-columns: ${(props) => `repeat(${props.count}, 33.333%)`};
   grid-template-rows: 33% 33% 33%;
   grid-auto-flow: column;
+  width: 100%;
   overflow-x: hidden;
   margin: 0 17px;
   scroll-behavior: smooth;
@@ -120,7 +121,7 @@ const StyledMediaItemCollctions = styled.div<{ count: number }>`
 const MediaItem = styled.div`
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 60px;
   border-radius: 0.5em;
   padding: 5px 10px;
   &:hover {
@@ -129,13 +130,24 @@ const MediaItem = styled.div`
 `;
 
 const StyledControl = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   width: 50px;
+  height: 50px;
   &:hover {
     cursor: pointer;
     color: var(--primary);
   }
+`;
+
+const StyledImage = styled(LazyLoadImage)`
+  position: absolute;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.2rem;
+  position: absolute;
+  top: 0;
 `;
 
 const StyledItemName = styled.span<{ showArtist?: boolean; showAlbum?: boolean }>`

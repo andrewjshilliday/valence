@@ -22,7 +22,7 @@ export const MusicKitProvider = (props: any): JSX.Element => {
   );
 
   useEffect(() => {
-    MusicKit.getInstance().addEventListener('mediaItemDidChange', mediaItemDidChange);
+    MusicKit.getInstance().addEventListener('nowPlayingItemDidChange', nowPlayingItemDidChange);
     MusicKit.getInstance().addEventListener('playbackStateDidChange', playbackStateDidChange);
     MusicKit.getInstance().addEventListener('playbackTimeDidChange', playbackTimeDidChange);
 
@@ -30,13 +30,13 @@ export const MusicKitProvider = (props: any): JSX.Element => {
     volume != null ? setVolume(+volume) : setVolume(0.05);
 
     return () => {
-      MusicKit.getInstance().removeEventListener('mediaItemDidChange', mediaItemDidChange);
+      MusicKit.getInstance().removeEventListener('nowPlayingItemDidChange', nowPlayingItemDidChange);
       MusicKit.getInstance().removeEventListener('playbackStateDidChange', playbackStateDidChange);
       MusicKit.getInstance().removeEventListener('playbackTimeDidChange', playbackTimeDidChange);
     };
   }, []);
 
-  const mediaItemDidChange = (event: any) => {
+  const nowPlayingItemDidChange = (event: any) => {
     setNowPlayingItem(event.item);
   };
 
@@ -69,19 +69,16 @@ export const MusicKitProvider = (props: any): JSX.Element => {
 
 const playItem = async (item: MusicKit.MediaItem, startIndex: number = 0, shuffle: boolean = false) => {
   const musicKit = MusicKit.getInstance();
-  /* await MusicKit.getInstance().setQueue({
-    album: '1025210938'
-  });
-  play(); */
+  
   try {
     const { playParams } = item.attributes;
-    musicKit.player.shuffleMode = 0;
+    musicKit.shuffleMode = 0;
 
     if (
       musicKit.playbackState !== 2 &&
-      musicKit.player.nowPlayingItem &&
+      musicKit.nowPlayingItem &&
       item.type !== 'songs' &&
-      item.relationships?.tracks.data[startIndex]?.id === musicKit.player.nowPlayingItem.id
+      item.relationships?.tracks.data[startIndex]?.id === musicKit.nowPlayingItem.id
     ) {
       play();
       return;
@@ -96,14 +93,8 @@ const playItem = async (item: MusicKit.MediaItem, startIndex: number = 0, shuffl
     }
 
     if (shuffle) {
-      musicKit.player.shuffleMode = 1;
+      musicKit.shuffleMode = 1;
     }
-
-    /* if (item.type.includes('playlists')) {
-      nowPlayingPlaylist = item;
-    } else {
-      nowPlayingPlaylist = null;
-    } */
 
     play();
   } catch (ex) {
@@ -112,31 +103,31 @@ const playItem = async (item: MusicKit.MediaItem, startIndex: number = 0, shuffl
 };
 
 const play = () => {
-  MusicKit.getInstance().player.play();
+  MusicKit.getInstance().play();
 };
 
 const pause = () => {
-  MusicKit.getInstance().player.pause();
+  MusicKit.getInstance().pause();
 };
 
 const stop = () => {
-  MusicKit.getInstance().player.stop();
+  MusicKit.getInstance().stop();
 };
 
 const next = () => {
-  MusicKit.getInstance().player.skipToNextItem();
+  MusicKit.getInstance().skipToNextItem();
 };
 
 const previous = () => {
-  MusicKit.getInstance().player.skipToPreviousItem();
+  MusicKit.getInstance().skipToPreviousItem();
 };
 
 const seek = (time: number) => {
-  MusicKit.getInstance().player.seekToTime(time);
+  MusicKit.getInstance().seekToTime(time);
 };
 
 const setVolume = (volume: number) => {
-  MusicKit.getInstance().player.volume = volume;
+  MusicKit.getInstance().volume = volume;
   localStorage.setItem('volume', volume.toString());
 };
 

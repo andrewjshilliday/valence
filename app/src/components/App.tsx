@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from 'styled-components';
@@ -20,17 +20,6 @@ const App = (): JSX.Element => {
       }
     },
   });
-
-  useLayoutEffect(() => {
-    MusicKit.configure({
-      developerToken: import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_TOKEN,
-      app: {
-        name: 'Valence',
-        build: '0.1',
-        version: '0.1'
-      }
-    });
-  }, []);
 
   return (
     <React.StrictMode>

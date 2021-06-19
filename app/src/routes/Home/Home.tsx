@@ -50,7 +50,7 @@ const Home = (): JSX.Element => {
     data: heavyRotationData
   } = useQuery<MusicKit.Resource>(`homeHeavyRotation`, () => MusicKitApiService.HeavyRotation());
 
-  const { isLoading: recentPlayedAllLoading, error: recentPlayedAllError, data: recentPlayedAllData } = useQuery<
+  /* const { isLoading: recentPlayedAllLoading, error: recentPlayedAllError, data: recentPlayedAllData } = useQuery<
     MusicKit.MediaItem[]
   >(
     `homeRecentPlayedAll`,
@@ -59,8 +59,8 @@ const Home = (): JSX.Element => {
       return data;
     },
     { enabled: recentPlayedData?.data.length > 0 }
-  );
-  const { isLoading: heavyRotationAllLoading, error: heavyRotationAllError, data: heavyRotationAllData } = useQuery<
+  ); */
+  /* const { isLoading: heavyRotationAllLoading, error: heavyRotationAllError, data: heavyRotationAllData } = useQuery<
     MusicKit.MediaItem[]
   >(
     `homeHeavyRotationAll`,
@@ -69,7 +69,7 @@ const Home = (): JSX.Element => {
       return data;
     },
     { enabled: heavyRotationData?.data.length > 0 }
-  );
+  ); */
 
   const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery(
     `homeRecommendationsRelationships`,
@@ -79,7 +79,7 @@ const Home = (): JSX.Element => {
       heavyRotation: MusicKit.MediaItem[];
       newReleases: MusicKit.MediaItem[];
     }> => {
-      const recommendationsRelationships = recommendations.recommendations.map((recommendation: MusicKit.Resource) =>
+      /* const recommendationsRelationships = recommendations.recommendations.map((recommendation: MusicKit.Resource) =>
         MusicKitApiService.GetRelationships(recommendation.items)
       );
       const recentPlayedRelationships = MusicKitApiService.GetRelationships(recommendations.recentPlayed);
@@ -91,15 +91,15 @@ const Home = (): JSX.Element => {
         heavyRotationRelationships,
         newReleasesRelationships,
         Promise.all(recommendationsRelationships)
-      ]);
+      ]); */
 
       const data = {
-        recentPlayed: results[0],
-        heavyRotation: results[1],
-        newReleases: results[2],
+        recentPlayed: recommendations.recentPlayed, // results[0],
+        heavyRotation: recommendations.heavyRotation, // results[1],
+        newReleases: recommendations.newReleases, // results[2],
         recommendations: recommendations.recommendations.map((recommendation: MusicKit.Resource, index: number) => ({
           title: recommendation.title,
-          items: results[3][index]
+          items: recommendations.recommendations[index].items // results[3][index]
         }))
       };
       
@@ -109,9 +109,9 @@ const Home = (): JSX.Element => {
       enabled:
         !recommendationsLoading &&
         !recentPlayedLoading &&
-        !heavyRotationLoading &&
+        !heavyRotationLoading /* &&
         !recentPlayedAllLoading &&
-        !heavyRotationAllLoading
+        !heavyRotationAllLoading */
     }
   );
 
@@ -123,8 +123,8 @@ const Home = (): JSX.Element => {
     return {
       madeForYou: recommendationsData.find((result: any) => result.attributes.title.stringForDisplay === 'Made for You')
         .relationships.contents.data,
-      recentPlayed: relationshipsData?.recentPlayed ?? recentPlayedAllData ?? recentPlayedData?.data,
-      heavyRotation: relationshipsData?.heavyRotation ?? heavyRotationAllData ?? heavyRotationData?.data,
+      recentPlayed: relationshipsData?.recentPlayed /* ?? recentPlayedAllData */ ?? recentPlayedData?.data,
+      heavyRotation: relationshipsData?.heavyRotation /* ?? heavyRotationAllData */ ?? heavyRotationData?.data,
       newReleases:
         relationshipsData?.newReleases ??
         recommendationsData.find((result: any) => result.attributes.title.stringForDisplay === 'New Releases')
@@ -149,8 +149,8 @@ const Home = (): JSX.Element => {
     };
   }, [
     relationshipsData,
-    recentPlayedAllData,
-    heavyRotationAllData,
+    /* recentPlayedAllData,
+    heavyRotationAllData, */
     recommendationsData,
     recentPlayedData,
     heavyRotationData
@@ -167,14 +167,14 @@ const Home = (): JSX.Element => {
   return (
     <>
       <h1>Listen Now</h1>
-      {recommendations.madeForYou.length > 1 && <MediaItemCarousel items={recommendations.madeForYou} />}
-      {recommendations.recentPlayed.length > 1 && (
+      {recommendations.madeForYou.length > 0 && <MediaItemCarousel items={recommendations.madeForYou} />}
+      {recommendations.recentPlayed.length > 0 && (
         <MediaItemCarousel items={recommendations.recentPlayed} title="Recent Played" />
       )}
-      {recommendations.heavyRotation.length > 1 && (
+      {recommendations.heavyRotation.length > 0 && (
         <MediaItemCarousel items={recommendations.heavyRotation} title="Heavy Rotation" />
       )}
-      {recommendations.newReleases.length > 1 && (
+      {recommendations.newReleases.length > 0 && (
         <MediaItemCarousel items={recommendations.newReleases} title="New Releases" />
       )}
       {recommendations.recommendations.map((recommendation: any) => (
