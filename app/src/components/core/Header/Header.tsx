@@ -18,7 +18,7 @@ const Header = ({ className }: HeaderProps): JSX.Element => {
     if (query) {
       history.push(`/search/${query}`);
     }
-  }
+  };
 
   return (
     <StyledHeader className={className}>
@@ -30,7 +30,7 @@ const Header = ({ className }: HeaderProps): JSX.Element => {
           <>
             <IconButton icon={<StyledNotifications />} />
             <StyledProfileContextMenu
-              trigger={<IconButton icon={<StyledProfile />}/>}
+              trigger={<IconButton icon={<StyledProfile />} />}
               options={[
                 {
                   content: <Link to={'/settings'}>Settings</Link>,

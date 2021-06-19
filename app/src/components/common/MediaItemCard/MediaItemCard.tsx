@@ -134,7 +134,7 @@ const StyledImage = styled(LazyLoadImage)`
   top: 0;
 `;
 
-const StyledPlaceholder= styled.img`
+const StyledPlaceholder = styled.img`
   max-width: 100%;
   height: auto;
   border-radius: 0.5em;

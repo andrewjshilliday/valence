@@ -28,6 +28,6 @@ const useMemoAsync = <T,>(
   }, deps);
 
   return value;
-}
+};
 
 export default useMemoAsync;

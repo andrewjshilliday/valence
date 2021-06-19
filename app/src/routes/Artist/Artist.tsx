@@ -47,7 +47,9 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
       </HeaderContainer>
       {artist.views ? (
         <>
-          {artist.views['top-songs'].data.length > 0 && <MediaItemGrid items={artist.views['top-songs'].data} showArtwork />}
+          {artist.views['top-songs'].data.length > 0 && (
+            <MediaItemGrid items={artist.views['top-songs'].data} showArtwork />
+          )}
           {artist.views['full-albums'].data.length > 0 && (
             <MediaItemCarousel items={artist.views['full-albums'].data} title="Albums" />
           )}

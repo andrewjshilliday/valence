@@ -18,7 +18,7 @@ const App = (): JSX.Element => {
         retry: false,
         staleTime: 60 * 1000 * 5
       }
-    },
+    }
   });
 
   return (

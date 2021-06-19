@@ -33,7 +33,9 @@ const GetHeaders = () => {
 };
 
 const Artist = async (id: string, include?: string): Promise<MusicKit.MediaItem> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists/${id}?extend[artists]=artistBio,bornOrFormed,origin,isGroup&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,featured-playlists,compilation-albums,singles,full-albums`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${
+    MusicKit.getInstance().storefrontId
+  }/artists/${id}?extend[artists]=artistBio,bornOrFormed,origin,isGroup&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,featured-playlists,compilation-albums,singles,full-albums`;
   let params: MusicKit.QueryParameters = {};
 
   if (include) {
@@ -45,7 +47,9 @@ const Artist = async (id: string, include?: string): Promise<MusicKit.MediaItem>
 };
 
 const Artists = async (ids: string[], include?: string): Promise<MusicKit.MediaItem[]> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/artists?extend[songs]=artistUrl&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,playlists,compilation-albums,singles,full-albums`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${
+    MusicKit.getInstance().storefrontId
+  }/artists?extend[songs]=artistUrl&views=live-albums,featured-release,more-to-hear,featured-albums,latest-release,top-songs,similar-artists,appears-on-albums,playlists,compilation-albums,singles,full-albums`;
   let response: MusicKit.MediaItem[] = [];
   const limit = 30;
   let startPosition = 0;
@@ -67,7 +71,9 @@ const Artists = async (ids: string[], include?: string): Promise<MusicKit.MediaI
 };
 
 const Album = async (id: string, include?: string): Promise<MusicKit.MediaItem> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/albums/${id}?views=related-albums,other-versions,appears-on`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${
+    MusicKit.getInstance().storefrontId
+  }/albums/${id}?views=related-albums,other-versions,appears-on`;
   let params: MusicKit.QueryParameters = {};
 
   if (include) {
@@ -162,7 +168,9 @@ const Songs = async (ids: string[], include?: string): Promise<MusicKit.MediaIte
 };
 
 const Search = async (term: string, types?: string, limit?: number): Promise<MusicKit.Resource> => {
-  const url = `${APPLE_MUSIC_API}/v1/catalog/${MusicKit.getInstance().storefrontId}/search?relate[albums]=artists&relate[playlists]=curator&relate[songs]=artists,albums`;
+  const url = `${APPLE_MUSIC_API}/v1/catalog/${
+    MusicKit.getInstance().storefrontId
+  }/search?relate[albums]=artists&relate[playlists]=curator&relate[songs]=artists,albums`;
   let params: MusicKit.QueryParameters = {
     term: term
   };

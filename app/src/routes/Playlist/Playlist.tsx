@@ -153,7 +153,6 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
 
 export default Playlist;
 
-
 const StyledLoading = styled.div`
   height: 100%;
   width: 100%;

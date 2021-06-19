@@ -102,7 +102,7 @@ const Home = (): JSX.Element => {
           items: recommendations.recommendations[index].items // results[3][index]
         }))
       };
-      
+
       return data;
     },
     {

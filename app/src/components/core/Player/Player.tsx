@@ -15,7 +15,7 @@ const selector = (s: any) => [
   s.playbackLoading,
   s.setCurrentPlaybackTime,
   s.setCurrentPlaybackTimeRemaining
-]
+];
 
 const Player = ({ className }: PlayerProps): JSX.Element => {
   const musicKit = useMusicKit();
@@ -34,14 +34,17 @@ const Player = ({ className }: PlayerProps): JSX.Element => {
     isPlaying,
     nowPlayingItem,
     playbackLoading
-  ] = usePlayerStore((s) => [
-    s.currentPlaybackDuration,
-    s.currentPlaybackTime,
-    s.currentPlaybackTimeRemaining,
-    s.isPlaying,
-    s.nowPlayingItem,
-    s.playbackLoading
-  ], shallow);
+  ] = usePlayerStore(
+    (s) => [
+      s.currentPlaybackDuration,
+      s.currentPlaybackTime,
+      s.currentPlaybackTimeRemaining,
+      s.isPlaying,
+      s.nowPlayingItem,
+      s.playbackLoading
+    ],
+    shallow
+  );
 
   if (!nowPlayingItem) {
     return (

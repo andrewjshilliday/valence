@@ -40,7 +40,7 @@ const iconStyles = css`
   align-items: center;
   position: relative;
   margin: 1rem 2rem;
-  color: ${props => props.theme.onPrimary};
+  color: ${(props) => props.theme.onPrimary};
   line-height: 0.5rem;
   text-decoration: none;
 

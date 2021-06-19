@@ -19,8 +19,8 @@ const AppContainer = styled.div`
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: ${props => props.theme.primary};
-  color: ${props => props.theme.onPrimary};
+  background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.onPrimary};
   display: grid;
   grid-template-columns: 150px auto;
   grid-template-rows: 150px auto 150px;

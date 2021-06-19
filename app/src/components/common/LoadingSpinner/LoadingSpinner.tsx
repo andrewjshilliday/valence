@@ -2,14 +2,15 @@ import React from 'react';
 import { IconLoading } from '../../icons';
 import styled, { keyframes } from 'styled-components';
 
-const LoadingSpinner = (): JSX.Element => {  
+const LoadingSpinner = (): JSX.Element => {
   return (
-    <LoadingContainer><IconLoading /></LoadingContainer>
+    <LoadingContainer>
+      <IconLoading />
+    </LoadingContainer>
   );
-}
+};
 
 export default LoadingSpinner;
-
 
 const spin = keyframes`
   from {
@@ -26,7 +27,7 @@ const LoadingContainer = styled.div`
   animation-name: ${spin};
   animation-duration: 2000ms;
   animation-iteration-count: infinite;
-  animation-timing-function: linear; 
+  animation-timing-function: linear;
 
   svg {
     height: 100%;

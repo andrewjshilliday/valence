@@ -69,7 +69,7 @@ export const MusicKitProvider = (props: any): JSX.Element => {
 
 const playItem = async (item: MusicKit.MediaItem, startIndex: number = 0, shuffle: boolean = false) => {
   const musicKit = MusicKit.getInstance();
-  
+
   try {
     const { playParams } = item.attributes;
     musicKit.shuffleMode = 0;
