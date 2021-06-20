@@ -10,7 +10,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => (
   <AppContainer>
     <StyledHeader />
     <StyledSidebar />
-    <StyledAppBody>{children}</StyledAppBody>
+    <StyledAppBody id={'main'}>{children}</StyledAppBody>
     <StyledPlayer />
   </AppContainer>
 );

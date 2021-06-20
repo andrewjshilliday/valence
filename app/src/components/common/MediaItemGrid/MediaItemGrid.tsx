@@ -1,21 +1,25 @@
 import React, { useEffect, createRef } from 'react';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import styled from 'styled-components';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { MusicKitService } from '../../../services';
+import { LazyLoadImage } from '../../common';
 import arrow from '../../../assets/images/arrow.svg';
 
 type MediaItemGridProps = {
   items: MusicKit.MediaItem[];
   showArtwork?: boolean;
   showArtist?: boolean;
-  showAlbum?: boolean;
   title?: string;
 };
 
 type ScrollDirection = 'left' | 'right';
 
-const MediaItemGrid = ({ items, showArtwork, showArtist, showAlbum, title }: MediaItemGridProps): JSX.Element => {
+const MediaItemGrid = ({
+  items,
+  showArtwork,
+  showArtist,
+  title
+}: MediaItemGridProps): JSX.Element => {
   const rowRef = createRef<HTMLDivElement>();
   const leftIconRef = createRef<HTMLDivElement>();
   const rightIconRef = createRef<HTMLDivElement>();
@@ -67,25 +71,42 @@ const MediaItemGrid = ({ items, showArtwork, showArtist, showAlbum, title }: Med
         <StyledLeftIcon ref={leftIconRef} onClick={() => scroll('left')} />
         <StyledMediaItemCollctions ref={rowRef} count={Math.ceil(items.length / 3)}>
           {items.map((item: MusicKit.MediaItem) => (
-            <MediaItem key={item.id}>
+            <StyledMediaItem key={item.id}>
               <StyledControl>
                 <i className="fas fa-plus"></i>
-                {showArtwork && (
-                  <StyledImage
-                    src={MusicKitService.FormatArtwork(item.attributes.artwork, 44)}
-                    alt={item.attributes.name}
-                  />
-                )}
+                {showArtwork && <LazyLoadImage alt={item.attributes.name} artwork={item.attributes.artwork} />}
               </StyledControl>
-              <StyledItemName showArtist={showArtist} showAlbum={showAlbum} className="text-truncate">
-                {item.attributes.name}
-              </StyledItemName>
-              {showArtist && (
-                <StyledArtistName className="text-truncate">{item.attributes.artistName}</StyledArtistName>
-              )}
-              {showAlbum && <StyledAlbumName className="text-truncate">{item.attributes.albumName}</StyledAlbumName>}
+              <StyledItemDetails>
+                <StyledItemName showArtist={showArtist} className="text-truncate">
+                  {item.attributes.name}
+                </StyledItemName>
+                <StyledMoreDetail className="text-truncate">
+                  {showArtist ? (
+                    <>
+                      {item.relationships?.artists?.data.length > 0 ? (
+                        <Link to={`/artist/${item.relationships.artists.data[0].id}`}>
+                          {item.attributes.artistName}
+                        </Link>
+                      ) : (
+                        item.attributes.artistName
+                      )}
+                      {' '}·{' '}
+                      {item.relationships?.albums?.data.length > 0 ? (
+                        <Link to={`/album/${item.relationships.albums.data[0].id}`}>
+                          {item.attributes.albumName}
+                        </Link>
+                      ) : (
+                        item.attributes.albumName
+                      )}
+                    </>
+                  ) : (
+                    <>{item.attributes.albumName}</>
+                  )}
+                </StyledMoreDetail>
+              </StyledItemDetails>
               <StyledDuration>{moment.utc(item.attributes.durationInMillis).format('m:ss')}</StyledDuration>
-            </MediaItem>
+              <StyledContext />
+            </StyledMediaItem>
           ))}
         </StyledMediaItemCollctions>
         <StyledRightIcon ref={rightIconRef} onClick={() => scroll('right')} />
@@ -114,16 +135,18 @@ const StyledMediaItemCollctions = styled.div<{ count: number }>`
   grid-auto-flow: column;
   width: 100%;
   overflow-x: hidden;
-  margin: 0 17px;
   scroll-behavior: smooth;
 `;
 
-const MediaItem = styled.div`
-  display: flex;
+const StyledMediaItem = styled.div`
+  display: grid;
+  grid-template-columns: 60px auto 50px 30px;
+  grid-template-rows: 60px;
+  grid-template-areas: 'control item-details duration context';
   align-items: center;
-  height: 60px;
   border-radius: 0.5em;
   padding: 5px 10px;
+
   &:hover {
     background-color: var(--background-darker);
   }
@@ -131,66 +154,44 @@ const MediaItem = styled.div`
 
 const StyledControl = styled.div`
   position: relative;
-  display: flex;
+  grid-area: control;
   justify-content: center;
   width: 50px;
   height: 50px;
+
   &:hover {
     cursor: pointer;
     color: var(--primary);
   }
 `;
 
-const StyledImage = styled(LazyLoadImage)`
-  position: absolute;
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.2rem;
-  position: absolute;
-  top: 0;
+const StyledItemDetails = styled.div`
+  grid-area: item-details;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    'top'
+    'bottom';
 `;
 
 const StyledItemName = styled.span<{ showArtist?: boolean; showAlbum?: boolean }>`
-  ${({ showArtist, showAlbum }) => {
-    if (showArtist && showAlbum) {
-      return `
-        max-width: calc(100% - 450px);
-        width: 50%;
-      `;
-    } else if (showArtist && !showAlbum) {
-      return `
-        max-width: calc(100% - 280px);
-        width: 75%;
-      `;
-    } else if (!showArtist && showAlbum) {
-      return `
-        max-width: calc(100% - 280px);
-        width: 75%;
-      `;
-    } else {
-      return `
-        max-width: calc(100% - 110px);
-        width: calc(100% - 110px);
-      `;
-    }
-  }}
+  grid-area: top;
 `;
 
-const StyledArtistName = styled.span`
-  width: 25%;
-  max-width: 170px;
-  min-width: 90px;
-`;
-
-const StyledAlbumName = styled.span`
-  width: 25%;
-  max-width: 170px;
-  min-width: 90px;
+const StyledMoreDetail = styled.span`
+  grid-area: bottom;
+  font-size: 0.75em;
+  opacity: 0.75;
 `;
 
 const StyledDuration = styled.span`
-  width: 60px;
+  grid-area: duration;
   text-align: right;
+`;
+
+const StyledContext = styled.div`
+  grid-area: context;
 `;
 
 const StyledLeftIcon = styled.div`

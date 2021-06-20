@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ProgressBar } from '../../../common/';
+import { ProgressBar, Slider } from '../../../common/';
 
 interface PlaybackProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   currentBufferedProgress?: number;

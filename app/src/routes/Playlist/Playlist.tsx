@@ -24,28 +24,8 @@ const Playlist = (props: RouteComponentProps<PlaylistRouterProps>): JSX.Element 
     () => MusicKitApiService.Playlist(id)
   );
 
-  const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery(
-    `playlistRelationshipsData-${id}`,
-    async (): Promise<MusicKit.MediaItem | undefined> => {
-      if (!playlist) {
-        return;
-      }
-
-      const playlistRelationships = cloneDeep(playlist);
-      playlistRelationships.relationships.tracks.data = await MusicKitApiService.GetRelationships(
-        playlist?.relationships.tracks.data
-      );
-
-      return playlistRelationships;
-    },
-    { enabled: !valenceLoading && !musicKitLoading }
-  );
-
-  const playlist = useMemo(() => relationshipsData ?? valencePlaylist ?? musicKitPlaylist, [
-    relationshipsData,
-    valencePlaylist,
-    musicKitPlaylist
-  ]);
+  const playlist = useMemo(() => valencePlaylist ?? musicKitPlaylist, [valencePlaylist, musicKitPlaylist]);
+  // const playlist = useMemo(() => musicKitPlaylist, [musicKitPlaylist]);
 
   const getPlaylistDuration = () => {
     if (!playlist) {

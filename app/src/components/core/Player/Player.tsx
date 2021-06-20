@@ -73,7 +73,7 @@ const Player = ({ className }: PlayerProps): JSX.Element => {
       />
       <StyledPlaybackProgress
         currentPlaybackDuration={currentPlaybackDuration ?? 0}
-        /* currentBufferedProgress={instance?.player.currentBufferedProgress ?? 0} */
+        /* currentBufferedProgress={currentBufferedProgress ?? 0} */
         currentPlaybackTime={currentPlaybackTime ?? 0}
         currentPlaybackTimeRemaining={currentPlaybackTimeRemaining ?? 0}
         seek={(v) => musicKit.seek(v)}

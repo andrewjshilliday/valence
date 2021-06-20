@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, ContextMenu, IconButton, SearchBar } from '../../common';
-import { IconMusic, IconNotification, IconProfile, IconSettings } from '../../icons';
+import { IconMusic, IconNotification, IconProfile, IconSettings, IconSignOut } from '../../icons';
 import { useAuthorization } from '../../providers';
 import { useAuthStore } from '../../../store';
 import Navigation from './Navigation/Navigation';
@@ -33,12 +33,14 @@ const Header = ({ className }: HeaderProps): JSX.Element => {
               trigger={<IconButton icon={<StyledProfile />} />}
               options={[
                 {
-                  content: <Link to={'/settings'}>Settings</Link>,
+                  content: 'Settings',
                   icon: <IconSettings />,
-                  key: 'settings-link'
+                  key: 'settings-link',
+                  onClick: () => history.push('/settings')
                 },
                 {
                   content: 'Sign Out',
+                  icon: <IconSignOut />,
                   key: 'sign-out-button',
                   onClick: () => auth.signOut()
                 }

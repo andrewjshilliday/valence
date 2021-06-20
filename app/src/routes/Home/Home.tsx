@@ -2,12 +2,13 @@ import React, { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import cloneDeep from 'lodash.clonedeep';
-import { LoadingSpinner, MediaItemCarousel } from '../../components/common';
+import { LoadingSpinner, MediaItemCarousel, MediaItemGrid } from '../../components/common';
 import { MusicKitApiService } from '../../services';
 
 type RecommendationsDataState = {
   madeForYou: MusicKit.MediaItem[];
   recentPlayed: MusicKit.MediaItem[];
+  recentPlayedTracks: MusicKit.MediaItem[];
   heavyRotation: MusicKit.MediaItem[];
   newReleases: MusicKit.MediaItem[];
   stations: MusicKit.MediaItem[];
@@ -17,6 +18,7 @@ type RecommendationsDataState = {
 const defaultRecommendationsState: RecommendationsDataState = {
   madeForYou: [],
   recentPlayed: [],
+  recentPlayedTracks: [],
   heavyRotation: [],
   newReleases: [],
   stations: [],
@@ -45,75 +47,15 @@ const Home = (): JSX.Element => {
     data: recentPlayedData
   } = useQuery<MusicKit.Resource>(`homeRecentPlayed`, () => MusicKitApiService.RecentPlayed());
   const {
+    isLoading: recentPlayedTracksLoading,
+    error: recentPlayedTracksError,
+    data: recentPlayedTracksData
+  } = useQuery<MusicKit.MediaItem[]>(`homeRecentPlayedTracks`, () => MusicKitApiService.RecentPlayedTracks());
+  const {
     isLoading: heavyRotationLoading,
     error: heavyRotationError,
     data: heavyRotationData
   } = useQuery<MusicKit.Resource>(`homeHeavyRotation`, () => MusicKitApiService.HeavyRotation());
-
-  /* const { isLoading: recentPlayedAllLoading, error: recentPlayedAllError, data: recentPlayedAllData } = useQuery<
-    MusicKit.MediaItem[]
-  >(
-    `homeRecentPlayedAll`,
-    async () => {
-      const data = await fetchAll(recentPlayedData);
-      return data;
-    },
-    { enabled: recentPlayedData?.data.length > 0 }
-  ); */
-  /* const { isLoading: heavyRotationAllLoading, error: heavyRotationAllError, data: heavyRotationAllData } = useQuery<
-    MusicKit.MediaItem[]
-  >(
-    `homeHeavyRotationAll`,
-    async () => {
-      const data = await fetchAll(heavyRotationData);
-      return data;
-    },
-    { enabled: heavyRotationData?.data.length > 0 }
-  ); */
-
-  const { isLoading: relationshipsLoading, error: relationshipsError, data: relationshipsData } = useQuery(
-    `homeRecommendationsRelationships`,
-    async (): Promise<{
-      recommendations?: MusicKit.Resource[];
-      recentPlayed: MusicKit.MediaItem[];
-      heavyRotation: MusicKit.MediaItem[];
-      newReleases: MusicKit.MediaItem[];
-    }> => {
-      /* const recommendationsRelationships = recommendations.recommendations.map((recommendation: MusicKit.Resource) =>
-        MusicKitApiService.GetRelationships(recommendation.items)
-      );
-      const recentPlayedRelationships = MusicKitApiService.GetRelationships(recommendations.recentPlayed);
-      const heavyRotationRelationships = MusicKitApiService.GetRelationships(recommendations.heavyRotation);
-      const newReleasesRelationships = MusicKitApiService.GetRelationships(recommendations.newReleases);
-
-      const results = await Promise.all([
-        recentPlayedRelationships,
-        heavyRotationRelationships,
-        newReleasesRelationships,
-        Promise.all(recommendationsRelationships)
-      ]); */
-
-      const data = {
-        recentPlayed: recommendations.recentPlayed, // results[0],
-        heavyRotation: recommendations.heavyRotation, // results[1],
-        newReleases: recommendations.newReleases, // results[2],
-        recommendations: recommendations.recommendations.map((recommendation: MusicKit.Resource, index: number) => ({
-          title: recommendation.title,
-          items: recommendations.recommendations[index].items // results[3][index]
-        }))
-      };
-
-      return data;
-    },
-    {
-      enabled:
-        !recommendationsLoading &&
-        !recentPlayedLoading &&
-        !heavyRotationLoading /* &&
-        !recentPlayedAllLoading &&
-        !heavyRotationAllLoading */
-    }
-  );
 
   const recommendations = useMemo(() => {
     if (!recommendationsData || !recentPlayedData || !heavyRotationData) {
@@ -123,38 +65,29 @@ const Home = (): JSX.Element => {
     return {
       madeForYou: recommendationsData.find((result: any) => result.attributes.title.stringForDisplay === 'Made for You')
         .relationships.contents.data,
-      recentPlayed: relationshipsData?.recentPlayed /* ?? recentPlayedAllData */ ?? recentPlayedData?.data,
-      heavyRotation: relationshipsData?.heavyRotation /* ?? heavyRotationAllData */ ?? heavyRotationData?.data,
-      newReleases:
-        relationshipsData?.newReleases ??
-        recommendationsData.find((result: any) => result.attributes.title.stringForDisplay === 'New Releases')
-          .relationships.contents.data,
+      recentPlayed: recentPlayedData?.data,
+      recentPlayedTracks: recentPlayedTracksData,
+      heavyRotation: heavyRotationData?.data,
+      newReleases: recommendationsData.find(
+        (result: any) => result.attributes.title.stringForDisplay === 'New Releases'
+      ).relationships.contents.data,
       stations: recommendationsData.find(
         (result: any) => result.attributes.title.stringForDisplay === 'Stations for You'
       ).relationships.contents.data,
-      recommendations:
-        relationshipsData?.recommendations ??
-        recommendationsData
-          .filter(
-            (result: any) =>
-              !result.attributes.isGroupRecommendation &&
-              result.attributes.title.stringForDisplay !== 'Made for You' &&
-              result.attributes.title.stringForDisplay !== 'New Releases' &&
-              result.attributes.title.stringForDisplay !== 'Stations for You'
-          )
-          .map((result: any) => ({
-            title: result.attributes.title.stringForDisplay,
-            items: result.relationships.contents.data
-          }))
+      recommendations: recommendationsData
+        .filter(
+          (result: any) =>
+            !result.attributes.isGroupRecommendation &&
+            result.attributes.title.stringForDisplay !== 'Made for You' &&
+            result.attributes.title.stringForDisplay !== 'New Releases' &&
+            result.attributes.title.stringForDisplay !== 'Stations for You'
+        )
+        .map((result: any) => ({
+          title: result.attributes.title.stringForDisplay,
+          items: result.relationships.contents.data
+        }))
     };
-  }, [
-    relationshipsData,
-    /* recentPlayedAllData,
-    heavyRotationAllData, */
-    recommendationsData,
-    recentPlayedData,
-    heavyRotationData
-  ]);
+  }, [recommendationsData, recentPlayedData, recentPlayedTracksData, heavyRotationData]);
 
   if (!recommendations.madeForYou.length) {
     return (
@@ -169,7 +102,10 @@ const Home = (): JSX.Element => {
       <h1>Listen Now</h1>
       {recommendations.madeForYou.length > 0 && <MediaItemCarousel items={recommendations.madeForYou} />}
       {recommendations.recentPlayed.length > 0 && (
-        <MediaItemCarousel items={recommendations.recentPlayed} title="Recent Played" />
+        <MediaItemCarousel items={recommendations.recentPlayed} title="Recent Played Albums" />
+      )}
+      {recommendations.recentPlayedTracks?.length && (
+        <MediaItemGrid items={recommendations.recentPlayedTracks} showArtwork showArtist title="Recent Played Tracks" />
       )}
       {recommendations.heavyRotation.length > 0 && (
         <MediaItemCarousel items={recommendations.heavyRotation} title="Heavy Rotation" />

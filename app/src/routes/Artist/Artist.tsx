@@ -22,8 +22,8 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
     () => MusicKitApiService.Artist(id, 'albums,playlists')
   );
 
-  // const artist = useMemo(() => valenceArtist ?? musicKitArtist, [valenceArtist, musicKitArtist]);
-  const artist = useMemo(() => musicKitArtist, [musicKitArtist]);
+  const artist = useMemo(() => valenceArtist ?? musicKitArtist, [valenceArtist, musicKitArtist]);
+  // const artist = useMemo(() => musicKitArtist, [musicKitArtist]);
 
   if (!artist || valenceLoading || musicKitLoading) {
     return (
@@ -50,8 +50,19 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
           {artist.views['top-songs'].data.length > 0 && (
             <MediaItemGrid items={artist.views['top-songs'].data} showArtwork />
           )}
-          {artist.views['full-albums'].data.length > 0 && (
-            <MediaItemCarousel items={artist.views['full-albums'].data} title="Albums" />
+          {artist.relationships?.albums.data.filter(
+            (item: MusicKit.MediaItem) => !item.attributes.isSingle && !item.attributes.isCompilation
+          ).length > 0 ? (
+            <MediaItemCarousel
+              items={artist.relationships.albums.data.filter(
+                (item: MusicKit.MediaItem) => !item.attributes.isSingle && !item.attributes.isCompilation
+              )}
+              title="Albums"
+            />
+          ) : (
+            artist.views['full-albums'].data.length > 0 && (
+              <MediaItemCarousel items={artist.views['full-albums'].data} title="Albums" />
+            )
           )}
           {artist.views['singles'].data.length > 0 && (
             <MediaItemCarousel items={artist.views['singles'].data} title="Singles" />
@@ -65,8 +76,12 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
           {artist.views['appears-on-albums'].data.length > 0 && (
             <MediaItemCarousel items={artist.views['appears-on-albums'].data} title="Appears On" />
           )}
-          {artist.relationships.playlists.data.length > 0 && (
+          {artist.relationships?.playlists.data.length > 0 ? (
             <MediaItemCarousel items={artist.relationships.playlists.data} title="Playlists" />
+          ) : (
+            artist.views['playlists'].data.length > 0 && (
+              <MediaItemCarousel items={artist.views['playlists'].data} title="Playlists" />
+            )
           )}
         </>
       ) : (

@@ -1,25 +1,61 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { MusicKitService } from '../../../services';
-import placeholder from '../../../assets/images/placeholder.jpeg';
+import styled, { css } from 'styled-components';
+import { ContextMenu, IconButton, LazyLoadImage } from '../../common';
+import { IconDotsHorizontalCirlce, IconHeartFull, IconPlay, IconPlayLater, IconPlayNext, IconShuffle } from '../../icons';
 
 type MediaItemCardProps = {
   item: MusicKit.MediaItem;
 };
 
 const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+
+  const contextMenu = (
+    <ContextMenu
+      trigger={<StyledContextButton contextMenuOpen={contextMenuOpen} />}
+      triggerPositioningStyles={ContextButtonPositioning}
+      onOpen={() => setContextMenuOpen(true)}
+      onClose={() => setContextMenuOpen(false)}
+      options={[
+        {
+          content: 'Play',
+          icon: <IconPlay />,
+          key: 'play'
+        },
+        {
+          content: 'Shuffle',
+          icon: <IconShuffle />,
+          key: 'shuffle'
+        },
+        {
+          content: 'Play Next',
+          icon: <IconPlayNext />,
+          key: 'play-next'
+        },
+        {
+          content: 'Play Later',
+          icon: <IconPlayLater />,
+          key: 'play-later'
+        },
+        {
+          content: 'Love',
+          icon: <IconHeartFull />,
+          key: 'love'
+        }
+      ]}
+    />
+  );
+
   const albumTemplate = (
     <>
+      {contextMenu}
       <Link to={`/album/${item.id}`}>
-        <StyledImageContainer>
-          <StyledImage
-            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
-            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
-            alt={item.attributes.name}
-          />
-        </StyledImageContainer>
+        <div style={{ position: 'relative' }}>
+          <LazyLoadImage alt={item.attributes.name} artwork={item.attributes.artwork} />
+        </div>
+      </Link>
+      <Link to={`/album/${item.id}`}>
         <span className="text-truncate">{item.attributes.name}</span>
       </Link>
       {item.relationships?.artists?.data.length > 0 ? (
@@ -33,32 +69,21 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
   );
   const playlistTemplate = (
     <>
+      {contextMenu}
       <Link to={`/playlist/${item.id}`}>
-        <StyledImageContainer>
-          <StyledImage
-            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
-            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
-            alt={item.attributes.name}
-          />
-        </StyledImageContainer>
+        <LazyLoadImage alt={item.attributes.name} artwork={item.attributes.artwork} />
+      </Link>
+      <Link to={`/album/${item.id}`}>
         <span className="text-truncate">{item.attributes.name}</span>
       </Link>
       <span className="text-truncate">{item.attributes.curatorName}</span>
     </>
   );
   const artistTemplate = (
-    <>
-      <Link to={`/artist/${item.id}`}>
-        <StyledImageContainer>
-          <StyledImage
-            src={item.attributes.artwork ? MusicKitService.FormatArtwork(item.attributes.artwork, 500) : placeholder}
-            placeholder={<StyledPlaceholder src={placeholder} alt={item.attributes.name} />}
-            alt={item.attributes.name}
-          />
-        </StyledImageContainer>
-        <span className="text-truncate">{item.attributes.name}</span>
-      </Link>
-    </>
+    <Link to={`/artist/${item.id}`}>
+      <LazyLoadImage alt={item.attributes.name} artwork={item.attributes.artwork} />
+      <span className="text-truncate">{item.attributes.name}</span>
+    </Link>
   );
 
   return (
@@ -72,7 +97,15 @@ const MediaItemCard = ({ item }: MediaItemCardProps): JSX.Element => {
 
 export default MediaItemCard;
 
+const StyledContextButton = styled(IconDotsHorizontalCirlce)<{ contextMenuOpen: boolean }>`
+  opacity: ${({ contextMenuOpen }) => (contextMenuOpen ? 1 : 0)};
+  transition: opacity 100ms ease-in-out;
+  height: 2.25rem;
+  width: 2.25rem;
+`;
+
 const MediaItem = styled.div`
+  position: relative;
   padding: 0 10px;
   span {
     display: block;
@@ -118,26 +151,15 @@ const MediaItem = styled.div`
       max-width: 50%;
     }
   }
+
+  :hover ${StyledContextButton} {
+    opacity: 1;
+  }
 `;
 
-const StyledImageContainer = styled.div`
-  position: relative;
-  height: 0;
-  padding-top: 100%;
-`;
-
-const StyledImage = styled(LazyLoadImage)`
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.5em;
+const ContextButtonPositioning = css`
   position: absolute;
-  top: 0;
-`;
-
-const StyledPlaceholder = styled.img`
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.5em;
-  position: absolute;
-  top: 0;
+  bottom: 50px;
+  right: 20px;
+  z-index: 10;
 `;

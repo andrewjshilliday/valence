@@ -16,7 +16,7 @@ const App = (): JSX.Element => {
     defaultOptions: {
       queries: {
         retry: false,
-        staleTime: 60 * 1000 * 5
+        staleTime: 60 * 1000 * 60 * 10
       }
     }
   });

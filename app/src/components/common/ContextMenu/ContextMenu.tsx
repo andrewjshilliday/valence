@@ -1,13 +1,17 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import styled, { FlattenSimpleInterpolation } from 'styled-components';
+import { useCallbackRef, useMergeRef } from '../../../hooks';
 
 interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   closeOnMenuClick?: boolean;
   maxWidth?: number | 'none';
   minWidth?: number | 'none';
+  onOpen?: () => void;
+  onClose?: () => void;
   options: Option[];
   trigger: React.ReactNode;
+  triggerPositioningStyles?: FlattenSimpleInterpolation;
 }
 
 type Option = {
@@ -22,26 +26,30 @@ const ContextMenu = ({
   className,
   closeOnMenuClick = true,
   maxWidth = 200,
-  minWidth = 125,
+  minWidth = 150,
+  onOpen,
+  onClose,
   options,
-  trigger
+  trigger,
+  triggerPositioningStyles
 }: ContextMenuProps): JSX.Element => {
   const [showMenu, setShowMenu] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const [xPosition, setXPosition] = useState(0);
   const [yPosition, setYPosition] = useState(0);
 
-  useEffect(() => {
-    if (showMenu) {
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuListenerRef = useCallbackRef(
+    useCallback(() => {
       document.addEventListener('click', handleClickOutside);
-    }
-    return () => {
-      if (showMenu) {
+      document.getElementById('main')!.addEventListener('scroll', closeMenu);
+      return () => {
         document.removeEventListener('click', handleClickOutside);
-      }
-    };
-  }, [showMenu]);
+        document.getElementById('main')!.removeEventListener('scroll', closeMenu);
+      };
+    }, [showMenu])
+  );
+  const mergedMenuRef = useMergeRef(menuRef, menuListenerRef);
 
   useLayoutEffect(() => {
     if (!menuRef.current) {
@@ -50,6 +58,10 @@ const ContextMenu = ({
     if (menuRef.current.offsetLeft + menuRef.current.offsetWidth + 20 > document.body.offsetWidth) {
       const menuWidth = menuRef.current.offsetWidth;
       setXPosition(document.body.offsetWidth - menuWidth - 45);
+    }
+    if (menuRef.current.offsetTop + menuRef.current.offsetHeight + 20 > document.body.offsetHeight) {
+      const menuHeight = menuRef.current.offsetHeight;
+      setYPosition(document.body.offsetHeight - menuHeight - 45);
     }
   });
 
@@ -61,26 +73,35 @@ const ContextMenu = ({
 
     setXPosition(triggerElement.left + triggerElement.width * 0.5);
     setYPosition(triggerElement.top + triggerElement.height * 1.1);
+
+    !showMenu && onOpen?.();
+    showMenu && onClose?.();
+
     setShowMenu(!showMenu);
+  };
+
+  const closeMenu = () => {
+    onClose?.();
+    setShowMenu(false);
   };
 
   const handleClickOutside = (event: any) => {
     if (showMenu && !triggerRef.current?.contains(event.target)) {
       if (!menuRef.current?.contains(event.target) || closeOnMenuClick) {
-        setShowMenu(false);
+        closeMenu();
       }
     }
   };
 
   return (
     <>
-      <div ref={triggerRef} onClick={toggleMenu}>
+      <StyledContextButton ref={triggerRef} styles={triggerPositioningStyles} onClick={toggleMenu}>
         {trigger}
-      </div>
+      </StyledContextButton>
       {showMenu &&
         ReactDOM.createPortal(
           <StyledContextMenu
-            ref={menuRef}
+            ref={mergedMenuRef}
             className={className}
             minWidth={minWidth}
             maxWidth={maxWidth}
@@ -88,7 +109,12 @@ const ContextMenu = ({
             y={yPosition}
           >
             {options?.map((option: Option) => (
-              <StyledOption key={option.key} className={'text-truncate'} hasIcon={option.icon != null}>
+              <StyledOption
+                key={option.key}
+                className={'text-truncate'}
+                hasIcon={option.icon != null}
+                onClick={option.onClick}
+              >
                 <StyledContent className={'text-truncate'}>{option.content}</StyledContent>
                 {option.icon && <StyledIcon>{option.icon}</StyledIcon>}
               </StyledOption>
@@ -101,6 +127,10 @@ const ContextMenu = ({
 };
 
 export default ContextMenu;
+
+const StyledContextButton = styled.div<{ styles: FlattenSimpleInterpolation | undefined }>`
+  ${({ styles }) => styles}
+`;
 
 const StyledContextMenu = styled.div<{ maxWidth: number | 'none'; minWidth: number | 'none'; x: number; y: number }>`
   position: absolute;
@@ -152,6 +182,11 @@ const StyledOption = styled.div<{ hasIcon: boolean }>`
 
 const StyledContent = styled.div`
   grid-area: content;
+
+  a:hover {
+    color: inherit;
+    text-decoration: none;
+  }
 `;
 
 const StyledIcon = styled.div`

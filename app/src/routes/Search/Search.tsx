@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { RouteComponentProps } from 'react-router-dom';
 import styled from 'styled-components';
-import cloneDeep from 'lodash.clonedeep';
 import { LoadingSpinner, MediaItemCarousel } from '../../components/common';
 import { MusicKitApiService } from '../../services';
 
@@ -17,26 +16,6 @@ const Search = (props: RouteComponentProps<AlbumRouterProps>): JSX.Element => {
     MusicKitApiService.Search(query, undefined, 10)
   );
 
-  /* const { isIdle, data: searchDataRelationships } = useQuery<MusicKit.Resource>(
-    ['searchDataRelationships', query],
-    async () => {
-      const newData = cloneDeep<MusicKit.Resource | undefined>(searchData);
-
-      if (newData?.albums && !newData.albums?.data[0]?.relationships) {
-        newData.albums.data = await MusicKitApiService.GetRelationships(newData.albums.data);
-      }
-      if (newData?.playlists && !newData.playlists?.data[0]?.relationships) {
-        newData.playlists.data = await MusicKitApiService.GetRelationships(newData.playlists.data);
-      }
-
-      return newData;
-    },
-    {
-      enabled: !!searchData
-    }
-  ); */
-
-  // const searchResults = useMemo(() => searchDataRelationships ?? searchData, [searchDataRelationships, searchData]);
   const searchResults = useMemo(() => searchData, [searchData]);
 
   if (!searchResults || isLoading) {
