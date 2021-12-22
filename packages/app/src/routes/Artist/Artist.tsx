@@ -79,7 +79,7 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
           {artist.relationships?.playlists.data.length > 0 ? (
             <MediaItemCarousel items={artist.relationships.playlists.data} title="Playlists" />
           ) : (
-            artist.views['playlists'].data.length > 0 && (
+            artist.views['playlists']?.data.length > 0 && (
               <MediaItemCarousel items={artist.views['playlists'].data} title="Playlists" />
             )
           )}
@@ -115,7 +115,7 @@ const Artist = (props: RouteComponentProps<ArtistRouterProps>): JSX.Element => {
           </StyledInfoGenre>
         </StyledArtistInfo>
       )}
-      {artist.views?.['similar-artists'].data.length > 0 && (
+      {artist.views?.['similar-artists']?.data.length > 0 && (
         <MediaItemCarousel items={artist.views['similar-artists'].data} title="Similar Artists" />
       )}
     </ArtistContainer>

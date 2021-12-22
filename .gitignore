@@ -1,6 +1,9 @@
-*/**/node_modules
-*/**/build
+**/node_modules
+**/build/**
+**/dist/**
 .env.local
 
-/api/.serverless
-/api/.webpack
+.turbo
+
+packages/api/.serverless
+packages/api/.webpack

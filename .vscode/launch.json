@@ -7,13 +7,13 @@
       "version": "beta",
       "name": "Launch app",
       "url": "http://localhost:8080/",
-      "webRoot": "${workspaceFolder}/app"
+      "webRoot": "${workspaceFolder}/packages/app"
     },
     {
       "type": "node",
       "request": "attach",
       "name": "Debug Serverless",
-      "cwd": "${workspaceFolder}/api/",
+      "cwd": "${workspaceFolder}/packages/api/",
       "processId": "${command:PickProcess}",
       "protocol": "inspector"
     },
@@ -21,7 +21,7 @@
       "name": "Debug Launch Serverless",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceRoot}/api/",
+      "cwd": "${workspaceRoot}/packages/api/",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "debug"],
       "port": 9229 

@@ -5,18 +5,20 @@ import './index.css';
 import './assets/styles/common.css';
 declare const MusicKit: any;
 
-(async () => {
-  await MusicKit.configure({
-    developerToken: import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_TOKEN,
-    app: {
-      name: 'Valence',
-      build: '0.1',
-      version: '0.1'
-    }
-  });
-
-  ReactDom.render(<App />, document.getElementById('root'));
-})();
+MusicKit.configure({
+  developerToken: import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_TOKEN,
+  app: {
+    name: 'Valence',
+    build: '0.1',
+    version: '0.1'
+  }/* ,
+  features: {
+    'seemless-audio-transitions': true,
+    bookmarking: true
+  } */
+}).then(() => {
+  ReactDom.render(<App />, document.getElementById('root'))
+});
 
 // Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
 // Learn more: https://snowpack.dev/concepts/hot-module-replacement
