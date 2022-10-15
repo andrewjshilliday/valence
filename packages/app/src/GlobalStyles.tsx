@@ -5,8 +5,8 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 300; */
+    font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
   }
 
   html {
@@ -58,7 +58,7 @@ const GlobalStyles = createGlobalStyle`
       outline-offset: 5px;
     } */
   }
-  
+
   /* h1 {
     font-size: 2.2rem;
     font-weight: 600;

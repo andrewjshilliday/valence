@@ -2,16 +2,16 @@ import React from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from 'styled-components';
-import Layout from './Layout';
-import { AuthorizationProvider, MusicKitProvider } from './providers';
-import { Artist, Album, Browse, Home, Playlist, Playlists, Search, Settings } from '../routes';
-import { useHistoryStore, useThemeStore } from '../store';
-import { lightTheme, darkTheme } from '../theme';
+import Layout from './components/Layout';
+import { AuthorizationProvider, MusicKitProvider } from './components/providers';
+import { Artist, Album, Browse, Home, Playlist, Playlists, Search, Settings } from './routes';
+import { useHistoryStore, useThemeStore } from './store';
+import { lightTheme, darkTheme } from './theme';
 import GlobalStyles from './GlobalStyles';
 
 const App = (): JSX.Element => {
-  const [theme] = useThemeStore((s) => [s.theme]);
-  const [] = useHistoryStore((s) => [s.addToHistory]);
+  // const [theme] = useThemeStore((s) => [s.theme]);
+  // const [] = useHistoryStore((s) => [s.addToHistory]);
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -26,7 +26,7 @@ const App = (): JSX.Element => {
       <QueryClientProvider client={queryClient}>
         <MusicKitProvider>
           <AuthorizationProvider>
-            <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+            <ThemeProvider theme={/* theme === 'light' ? lightTheme :  */darkTheme}>
               <Router>
                 <GlobalStyles />
                 <Layout>

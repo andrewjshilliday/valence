@@ -1,6 +1,6 @@
 import axios from 'axios';
 declare const MusicKit: any;
-const VALENCE_API = import.meta.env.SNOWPACK_PUBLIC_VALENCE_API;
+const VALENCE_API = import.meta.env.VITE_VALENCE_API;
 
 interface ValenceApiService {
   Album: (id: string) => Promise<any>;

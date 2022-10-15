@@ -1,7 +1,8 @@
 **/node_modules
 **/build/**
 **/dist/**
-.env.local
+**/.esbuild
+*.local
 
 .turbo
 

@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import cloneDeep from 'lodash.clonedeep';
 declare const MusicKit: any;
-const APPLE_MUSIC_API = import.meta.env.SNOWPACK_PUBLIC_MUSICKIT_API;
+const APPLE_MUSIC_API = import.meta.env.VITE_APPLE_MUSIC_API;
 
 type IncludeTypes = 'songs' | 'artists' | 'albums' | 'playlists';
 
