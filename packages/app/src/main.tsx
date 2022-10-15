@@ -3,7 +3,7 @@ import App from './App';
 declare const MusicKit: any;
 
 MusicKit.configure({
-  developerToken: import.meta.env.VITE_ACCESS_TOKEN,
+  developerToken: import.meta.env.VITE_MUSICKIT_TOKEN,
   app: {
     name: 'Valence',
     build: '0.1',
